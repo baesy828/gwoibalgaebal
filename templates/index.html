@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>개발을 괴발개발</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+    <!--datepicker-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='datepicker.min.css') }}">
+    <!--css삽입하려면 위 처럼 link rel="stylesheet" 후에 href=-->
+    <script src="{{ url_for('static', filename='datepicker.min.js') }}">
+    </script>
+    <!--JS삽입하려면 처럼 script src =-->
+    <script src="{{ url_for('static', filename='datepicker.en.js') }}">
+    </script>
+    <script>
+        /*bootstrap modal*/
+    </script>
+
+    <style>
+        /* 여기에 스타일 */
+        #review_reportButton {
+            text-align: right;
+        }
+
+        #inputButton {
+            text-align: right;
+        }
+    </style>
+
+    <script>
+        $('#dateSelector').data('datepicker')
+
+    </script>
+</head>
+
+<body>
+    <h1 style="text-align: center;">현황판</h1>
+    <div id="review_reportButton">
+        <button type="button" class="btn btn-outline-warning">리뷰 받기</button>
+        <button type="button" class="btn btn-outline-info">리포트 받기</button>
+    </div>
+    <!--현황판 테이블 -->
+    <table class="table table-dark">
+        <thead>
+            <tr>
+                <th scope="col"></th>
+                <th scope="col">PROJECT1</th>
+                <th scope="col">PROJECT2</th>
+                <th scope="col">PROJECT3</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row" style="text-align: center;">Today</th>
+                <td>''</td>
+                <td>''</td>
+                <td>''</td>
+            </tr>
+            <tr>
+                <th scope="row" style="text-align:center">This Week</th>
+                <td>''</td>
+                <td>''</td>
+                <td>''</td>
+            </tr>
+            <tr>
+                <th scope="row" style="text-align:center">Next Week</th>
+                <td>''</td>
+                <td>''</td>
+                <td>''</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <br>
+    <br>
+    <br>
+
+    <h1 style="text-align:center;">입력란</h1>
+    <!-- 입력란 테이블-->
+    <div id="inputButton">
+        <button type="button" onclick="schedulePlus()" class="btn btn-outline-warning">스케쥴 추가하기</button>
+        <button type="button" onclick="projectPlus()" class="btn btn-outline-info">프로젝트 추가하기</button>
+    </div>
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th scope="col">날짜 선택</th>
+                <th scope="col">project</th>
+                <th scope="col">내용</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr id="scheduleLine">
+                <th scope="row">
+                    <input id="dateSelector" type='text' class="datepicker-here" data-position="right top"
+                        data-language='en' />
+                </th>
+                <td>여기에 뭔가가</td>
+                <td>Otto</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+
+</html>
