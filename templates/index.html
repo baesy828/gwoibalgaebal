@@ -21,16 +21,36 @@
         integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
 
-    <!--datepicker-->
-    <link rel="stylesheet" href="{{ url_for('static', filename='datepicker.min.css') }}">
-    <!--css삽입하려면 위 처럼 link rel="stylesheet" 후에 href=-->
-    <script src="{{ url_for('static', filename='datepicker.min.js') }}">
-    </script>
-    <!--JS삽입하려면 처럼 script src =-->
-    <script src="{{ url_for('static', filename='datepicker.en.js') }}">
-    </script>
+    <!--Datepicker css & js-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='datepicker.css') }}">
+    <!--          css삽입하려면 위 처럼 link rel="stylesheet" 후에 href=-->
+    <script type="text/javascript" src="{{ url_for('static', filename='datepicker.js') }}"></script>
+    <!--          JS삽입하려면 처럼 script src =-->
+
+    <!--모달박스 프로젝트 select-->
+    <link href="{{ url_for('static', filename='modalprojectselect.css') }}" rel="stylesheet" />
+
     <script>
         /*bootstrap modal*/
+        $('#myModal').on('shown.bs.modal', function () {
+            $('#myInput').trigger('focus')
+        })
+
+        /*jquery달력*/
+        $(function () {
+            $('[data-toggle="datepicker"]').datepicker({
+                autoHide: true,
+                zIndex: 2048,
+            });
+        });
+
+        /*모달박스 프로젝트 select*/
+        $(document).ready(function () {
+
+            // Material Select
+            $('.mdb-select').materialSelect({
+            });
+        })
     </script>
 
     <style>
@@ -44,10 +64,6 @@
         }
     </style>
 
-    <script>
-        $('#dateSelector').data('datepicker')
-
-    </script>
 </head>
 
 <body>
@@ -93,27 +109,70 @@
     <br>
 
     <h1 style="text-align:center;">입력란</h1>
-    <!-- 입력란 테이블-->
+    <!-- 입력란 버튼-->
     <div id="inputButton">
-        <button type="button" onclick="schedulePlus()" class="btn btn-outline-warning">스케쥴 추가하기</button>
+        <button type="button" class="btn btn-outline-warning" data-toggle="modal" data-target="#exampleModal"
+            data-whatever="@mdo">스케쥴 추가하기</button>
         <button type="button" onclick="projectPlus()" class="btn btn-outline-info">프로젝트 추가하기</button>
     </div>
+    <!--modal-->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">새 스케쥴 입력하기</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!--datepicker(날짜 선택 달력)-->
+                    <h6>날짜 선택</h6>
+                    <input type="text" class="form-control" data-toggle="datepicker">
+                    <br>
+                    <form>
+
+                        <!--프로젝트 드롭다운-->
+                        <select class="mdb-select md-form" editable="true" searchable="Search and add here...">
+                            <option value="" disabled selected>어떤 프로젝트?</option>
+                            <option value="1">프로젝트A</option>
+                            <option value="2">프로젝트B</option>
+                            <option value="3">프로젝트C</option>
+                        </select>
+                        <label class="mdb-main-label">프로젝트 선택</label>
+
+
+                        <!--스케쥴 내용 입력-->
+                        <br>
+                        <div class="form-group">
+                            <label for="message-text" class="col-form-label">내용 입력</label>
+                            <textarea class="form-control" id="message-text"></textarea>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <!--<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
+                    <button type="button" class="btn btn-warning">이렇게 할게요!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--입력란 테이블-->
     <table class="table table-sm">
         <thead>
             <tr>
-                <th scope="col">날짜 선택</th>
-                <th scope="col">project</th>
+                <th scope="col">날짜</th>
+                <th scope="col">프로젝트</th>
                 <th scope="col">내용</th>
             </tr>
         </thead>
         <tbody>
-            <tr id="scheduleLine">
-                <th scope="row">
-                    <input id="dateSelector" type='text' class="datepicker-here" data-position="right top"
-                        data-language='en' />
-                </th>
-                <td>여기에 뭔가가</td>
-                <td>Otto</td>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
             </tr>
         </tbody>
     </table>
