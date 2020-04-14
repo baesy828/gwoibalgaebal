@@ -44,13 +44,64 @@
             });
         });
 
-        /*모달박스 프로젝트 select*/
+        /*모달박스 프로젝트 select
         $(document).ready(function () {
-
             // Material Select
             $('.mdb-select').materialSelect({
             });
-        })
+        })*/
+
+        /*ajax로 스케쥴 입력 부분 post요청 */
+        function scheduleFix() {
+            $.ajax({
+                type: "POST",
+                url: "/schedules",
+                /*위에 어떤 url으로 요청할 것인가*/
+                data: { date_give: $('#scheduleDate').val(), project_give: $('#scheduleProject option:selected').text(), content_give: $('#scheduleConetent').val() },
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        alert('스케쥴이 저장됐습니다!힘내요!');
+                        window.location.reload();
+                    } else {
+                        alert('오류가 발생했습니다!')
+                    }
+                }
+            })
+        }
+
+        $(document).ready(function () {
+            $('#scheduleInputTable').html('');
+            listing();
+        });
+
+        /*ajax로 스케쥴 입력 부분 get요청하기*/
+        function listing() {
+            $.ajax({
+                type: "GET",
+                url: "/schedules",
+                data: {},
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        let schedules = response['schedules'];
+                        for (let i = 0; i < schedules.length; i++) {
+                            scheduleTablePlus(schedules[i]['scheduleDate'], schedules[i]['scheduleProject'], schedules[i]['scheduleContent'])
+                        }
+                    } else {
+                        alert('스케쥴 추가중 오류가 발생했습니다');
+                    }
+                }
+            })
+        }
+
+        /*append로 스케쥴표에 스케쥴 추가*/
+        function scheduleTablePlus(scheduleDate, scheduleProject, scheduleContent) {
+            let temp_html = '<tr>\
+                                <td>'+ scheduleDate + '</td>\
+                                <td>'+ scheduleProject + '</td>\
+                                <td>'+ scheduleContent + '</td>\
+                            </tr>';
+            $('#scheduleInputTable').append(temp_html);
+        }
     </script>
 
     <style>
@@ -129,37 +180,35 @@
                 <div class="modal-body">
                     <!--datepicker(날짜 선택 달력)-->
                     <h6>날짜 선택</h6>
-                    <input type="text" class="form-control" data-toggle="datepicker">
+                    <input id="scheduleDate" type="text" class="form-control" data-toggle="datepicker">
                     <br>
-                    <form>
+                    <!-- <form>-->
+                    <!--프로젝트 드롭다운-->
+                    <select id="scheduleProject" class="custom-select">
+                        <option selected>어떤 프로젝트?</option>
+                        <option value="1">프로젝트A</option>
+                        <option value="2">프로젝트B</option>
+                        <option value="3">프로젝트C</option>
+                    </select>
 
-                        <!--프로젝트 드롭다운-->
-                        <select class="mdb-select md-form" editable="true" searchable="Search and add here...">
-                            <option value="" disabled selected>어떤 프로젝트?</option>
-                            <option value="1">프로젝트A</option>
-                            <option value="2">프로젝트B</option>
-                            <option value="3">프로젝트C</option>
-                        </select>
-                        <label class="mdb-main-label">프로젝트 선택</label>
+                    <!--스케쥴 내용 입력-->
+                    <br>
+                    <div class="form-group">
+                        <label for="message-text" class="col-form-label">내용 입력</label>
+                        <textarea class="form-control" id="scheduleConetent"></textarea>
+                    </div>
 
-
-                        <!--스케쥴 내용 입력-->
-                        <br>
-                        <div class="form-group">
-                            <label for="message-text" class="col-form-label">내용 입력</label>
-                            <textarea class="form-control" id="message-text"></textarea>
-                        </div>
-
-                    </form>
+                    <!--   </form>-->
                 </div>
                 <div class="modal-footer">
                     <!--<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
-                    <button type="button" class="btn btn-warning">이렇게 할게요!</button>
+                    <button onclick="scheduleFix()" type="button" class="btn btn-warning">이렇게 할게요!</button>
                 </div>
             </div>
         </div>
     </div>
     <!--입력란 테이블-->
+    <br>
     <table class="table table-sm">
         <thead>
             <tr>
@@ -168,7 +217,7 @@
                 <th scope="col">내용</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="scheduleInputTable">
             <tr>
                 <td></td>
                 <td></td>
