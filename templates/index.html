@@ -31,7 +31,7 @@
     <link href="{{ url_for('static', filename='modalprojectselect.css') }}" rel="stylesheet" />
 
     <script>
-        /*bootstrap modal*/
+        /*bootstrap modal
         $('#myModal').on('shown.bs.modal', function () {
             $('#myInput').trigger('focus')
         })
@@ -43,13 +43,6 @@
                 zIndex: 2048,
             });
         });
-
-        /*모달박스 프로젝트 select
-        $(document).ready(function () {
-            // Material Select
-            $('.mdb-select').materialSelect({
-            });
-        })*/
 
         /*ajax로 스케쥴 입력 부분 post요청 */
         function scheduleFix() {
@@ -102,6 +95,69 @@
                             </tr>';
             $('#scheduleInputTable').append(temp_html);
         }
+
+        /*프로젝트 모달에 프로젝트 추가하기:버튼 누르면 보여주기*/
+        function projectPlus() {
+            if ($('#projectInputGroup').css('display') == 'block') {
+                $('#projectInputGroup').hide();
+            } else {
+                $('#projectInputGroup').show();
+            }
+        }
+
+        /*ajax로 프로젝트 입력 post요청 */
+        function projectFix() {
+            $.ajax({
+                type: "POST",
+                url: "/projects",
+                /*위에 어떤 url으로 요청할 것인가*/
+                data: { name_give: $('#projectName').val(), goal_give: $('#projectGoal').val(), pcontent_give: $('#projectContent').val() },
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        alert('프로젝트 시작을 축하합니다!');
+                        window.location.reload();
+                    } else {
+                        alert('오류가 발생했습니다!')
+                    }
+                }
+            })
+        }
+
+        /*프로젝트 값을 DB에서 가져온 후 select메뉴에 반영하기*/
+        function plisting() {
+            $.ajax({
+                type: "GET",
+                url: "/projects",
+                data: {},
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        let projects = response['projects'];
+                        $(document).ready(function () {
+                            for (let i = 0; i < projects.length; i++) {
+                                $('select.projectSelector option[value=' + projects[i]['projectName'] + ']').attr('selected', 'selected');
+                            }
+                        });
+
+                    } else {
+                        alert('프로젝트 추가중 오류가 발생했습니다');
+                    }
+                }
+            })
+        }
+
+
+
+        /*
+                /*프로젝트 모달에서 프로젝트 선택하면 해당 내용 보여주기
+                function pShowHide() {
+                    if ($('#scheduleProject').val() == $('#projectNameInDB').val()) {
+                        $('#pContentOneByOne').show();
+                    } else {
+                        $('#pContentOneByOne').hide();
+                    }
+                }*/
+
+
     </script>
 
     <style>
@@ -113,12 +169,17 @@
         #inputButton {
             text-align: right;
         }
+
+        #projectInputGroup {
+            display: none;
+        }
     </style>
 
 </head>
 
 <body>
     <h1 style="text-align: center;">현황판</h1>
+    <!--리뷰/리포트 버튼-->
     <div id="review_reportButton">
         <button type="button" class="btn btn-outline-warning">리뷰 받기</button>
         <button type="button" class="btn btn-outline-info">리포트 받기</button>
@@ -162,12 +223,13 @@
     <h1 style="text-align:center;">입력란</h1>
     <!-- 입력란 버튼-->
     <div id="inputButton">
-        <button type="button" class="btn btn-outline-warning" data-toggle="modal" data-target="#exampleModal"
+        <button type="button" class="btn btn-outline-warning" data-toggle="modal" data-target="#scheduleModal"
             data-whatever="@mdo">스케쥴 추가하기</button>
-        <button type="button" onclick="projectPlus()" class="btn btn-outline-info">프로젝트 추가하기</button>
+        <button type="button" class="btn btn-outline-info" data-toggle="modal" data-target=".bd-example-modal-xl">
+            프로젝트 보기</button>
     </div>
-    <!--modal-->
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    <!--스케쥴 모달-->
+    <div class="modal fade" id="scheduleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -182,7 +244,6 @@
                     <h6>날짜 선택</h6>
                     <input id="scheduleDate" type="text" class="form-control" data-toggle="datepicker">
                     <br>
-                    <!-- <form>-->
                     <!--프로젝트 드롭다운-->
                     <select id="scheduleProject" class="custom-select">
                         <option selected>어떤 프로젝트?</option>
@@ -197,8 +258,6 @@
                         <label for="message-text" class="col-form-label">내용 입력</label>
                         <textarea class="form-control" id="scheduleConetent"></textarea>
                     </div>
-
-                    <!--   </form>-->
                 </div>
                 <div class="modal-footer">
                     <!--<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
@@ -207,8 +266,72 @@
             </div>
         </div>
     </div>
-    <!--입력란 테이블-->
+
+    <!--프로젝트 모달-->
+    <div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">프로젝트 보기</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <select name="projectSelector" class="custom-select">
+                            <!--내용 볼 프로젝트 선택: 선택하면 내용 & 수정버튼show-->
+                            <option selected></option>
+                            <option value="1">11</option>
+                        </select>
+                        <!--셀렉된 프로젝트 이름&목적&내용 보여주기-->
+                        <table class="table" id="pContentOneByOne">
+                            <tbody>
+                                <tr>
+                                    <th scope="row">프로젝트명</th>
+                                    <td>Mark</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">프로젝트 목표</th>
+                                    <td>Mark</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">프로젝트 내용</th>
+                                    <td>Mark</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!--위 셀렉된 프로젝트 수정-->
+                        <button type="button" onclick="projectEdit()" class="btn btn-outline-info">수정하기</button>
+                        <!--위 셀렉된 프로젝트 삭제(경고창 띄울 것)-->
+                        <button type="button" onclick="projectDelete()" class="btn btn-outline-danger">삭제하기</button>
+                    </div>
+                    <br>
+                    <!--프로젝트 추가하기:버튼 누르면 입력창 show-> 입력창 내용 db로 보내기-->
+                    <button type="button" onclick="projectPlus()" class="btn btn-outline-warning">프로젝트 추가하기</button>
+                    <!--추가 프로젝트 입력란 : onclick상태에서 보여줌-->
+                    <div id="projectInputGroup">
+                        <div class="form-group">
+                            <label for="message-text" class="col-form-label">프로젝트명:</label>
+                            <textarea class="form-control" id="projectName"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="message-text" class="col-form-label">프로젝트 목표:</label>
+                            <textarea class="form-control" id="projectGoal"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="message-text" class="col-form-label">프로젝트 주요 내용:</label>
+                            <textarea class="form-control" id="projectContent"></textarea>
+                        </div>
+                        <button type="button" onclick="projectFix()" class="btn btn-info">입력!</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <br>
+    <!--입력란 테이블-->
     <table class="table table-sm">
         <thead>
             <tr>
