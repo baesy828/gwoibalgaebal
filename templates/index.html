@@ -27,9 +27,6 @@
     <script type="text/javascript" src="{{ url_for('static', filename='datepicker.js') }}"></script>
     <!--          JS삽입하려면 처럼 script src =-->
 
-    <!--모달박스 프로젝트 select-->
-    <link href="{{ url_for('static', filename='modalprojectselect.css') }}" rel="stylesheet" />
-
     <script>
         /*bootstrap modal
         $('#myModal').on('shown.bs.modal', function () {
@@ -132,31 +129,23 @@
                 success: function (response) {
                     if (response['result'] == 'success') {
                         let projects = response['projects'];
-                        $(document).ready(function () {
-                            for (let i = 0; i < projects.length; i++) {
-                                $('select.projectSelector option[value=' + projects[i]['projectName'] + ']').attr('selected', 'selected');
-                            }
-                        });
+                        $('#projectSelector').empty();
+                        for (let i = 0; i < projects.length; i++) {
+                            $('#projectSelector').append("<option value='" + projects[i]['projectName'] + "'>" + projects[i]['projectName'] + "</option>");
 
+                            /* 선택한 프로젝트의 값을 아래 테이블에 보여주기
+                            let selected = $('#projectSelector').find('option:selected');
+                            $('#pNameSelected').text() = projects[i]['projectName'];
+                            $('#pGoalSelected').text() = projects[i]['projectGoal'];
+                            $('#pContentSelected').text() = projects[i]['projectContent'];*/
+
+                        }
                     } else {
                         alert('프로젝트 추가중 오류가 발생했습니다');
                     }
                 }
             })
         }
-
-
-
-        /*
-                /*프로젝트 모달에서 프로젝트 선택하면 해당 내용 보여주기
-                function pShowHide() {
-                    if ($('#scheduleProject').val() == $('#projectNameInDB').val()) {
-                        $('#pContentOneByOne').show();
-                    } else {
-                        $('#pContentOneByOne').hide();
-                    }
-                }*/
-
 
     </script>
 
@@ -225,7 +214,9 @@
     <div id="inputButton">
         <button type="button" class="btn btn-outline-warning" data-toggle="modal" data-target="#scheduleModal"
             data-whatever="@mdo">스케쥴 추가하기</button>
-        <button type="button" class="btn btn-outline-info" data-toggle="modal" data-target=".bd-example-modal-xl">
+        <!--프로젝트 보기 버튼에 plisting 넣어줌-->
+        <button type="button" onclick="plisting()" class="btn btn-outline-info" data-toggle="modal"
+            data-target=".bd-example-modal-xl">
             프로젝트 보기</button>
     </div>
     <!--스케쥴 모달-->
@@ -280,25 +271,25 @@
                 </div>
                 <div class="modal-body">
                     <div>
-                        <select name="projectSelector" class="custom-select">
+                        <select id="projectSelector" class="custom-select">
                             <!--내용 볼 프로젝트 선택: 선택하면 내용 & 수정버튼show-->
                             <option selected></option>
-                            <option value="1">11</option>
+                            <option value="1"></option>
                         </select>
                         <!--셀렉된 프로젝트 이름&목적&내용 보여주기-->
                         <table class="table" id="pContentOneByOne">
                             <tbody>
                                 <tr>
                                     <th scope="row">프로젝트명</th>
-                                    <td>Mark</td>
+                                    <td id="pNameSelected"></td>
                                 </tr>
                                 <tr>
                                     <th scope="row">프로젝트 목표</th>
-                                    <td>Mark</td>
+                                    <td id="pGoalSelected"></td>
                                 </tr>
                                 <tr>
                                     <th scope="row">프로젝트 내용</th>
-                                    <td>Mark</td>
+                                    <td id="pContentSelected"></td>
                                 </tr>
                             </tbody>
                         </table>
