@@ -27,6 +27,20 @@
     <script type="text/javascript" src="{{ url_for('static', filename='datepicker.js') }}"></script>
     <!--          JS삽입하려면 처럼 script src =-->
 
+    <!--4/17기준 할 것 
+1. 프로젝트 모달에서 특정 프로젝트 선택했을 때 그 프로젝트의 내용이 하단 테이블에 저절로 노출
+2. 현황판에 날짜 반영 : 월-일 고정으로 자동 변동되게 
+3. 스케쥴에 입력된 내용들이 날짜 기준으로 자동으로 위 현황판에 반영
+4. 현황판에 반영된 내용에 이모티콘 자동 입력되고, 했다/안했다 체크할 수 있또록 할 것
+5. 했다/안했다 체크가 된 경우 리뷰를 작성할 수 있또록 할 것
+6. 아래 입력란 스케쥴 삭제 가능하도록 할 것 
+7. 리포트 내용 구성할 것
+8. 리뷰 페이지 구성할 것 
+9. 리뷰&리포트 페이지 엑셀로 다운받도록 할 것
+10. 프로젝트/스케쥴 삭제+수정 기능 넣기
+11. 로그인 페이지-->
+
+
     <script>
         /*bootstrap modal
         $('#myModal').on('shown.bs.modal', function () {
@@ -131,14 +145,8 @@
                         let projects = response['projects'];
                         $('#projectSelector').empty();
                         for (let i = 0; i < projects.length; i++) {
+                            /*프로젝트 db를 프로젝트 모달의 프로젝트 셀렉터에 show*/
                             $('#projectSelector').append("<option value='" + projects[i]['projectName'] + "'>" + projects[i]['projectName'] + "</option>");
-
-                            /* 선택한 프로젝트의 값을 아래 테이블에 보여주기
-                            let selected = $('#projectSelector').find('option:selected');
-                            $('#pNameSelected').text() = projects[i]['projectName'];
-                            $('#pGoalSelected').text() = projects[i]['projectGoal'];
-                            $('#pContentSelected').text() = projects[i]['projectContent'];*/
-
                         }
                     } else {
                         alert('프로젝트 추가중 오류가 발생했습니다');
@@ -146,6 +154,41 @@
                 }
             })
         }
+
+        /*프로젝트 값을 DB에서 가져온 후 스케쥴 보기 모달의 프로젝트 select메뉴에 반영하기*/
+        function schulePlusClick() {
+            $.ajax({
+                type: "GET",
+                url: "/projects",
+                data: {},
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        let projects = response['projects'];
+                        $('#projectSelector').empty();
+                        for (let i = 0; i < projects.length; i++) {
+                            /*프로젝트 db를 스케쥴 모달의 프로젝트 셀렉터에 show*/
+                            $('#scheduleProject').append("<option value='" + projects[i]['projectName'] + "'>" + projects[i]['projectName'] + "</option>");
+                        }
+                    }
+                }
+            })
+        }
+        /*현황판 부분 날짜 반영*/
+        let now = new Date();
+        let nowDayOfWeek = now.getDay();
+        let nowDay = now.getDate();
+        let nowMonth = now.getMonth();
+        let nowYear = now.getYear();
+        nowYear += (nowYear < 2000) ? 1900 : 0;
+        /*이번주 시작일, 월요일로 설정함*/
+        let weekStartDate = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek + 1);
+        /*이번주 끝나는 일, 일요일로 설정함 */
+        let weekEndDate = new Date(nowYear, nowMonth, nowDay + (7 - nowDayOfWeek));
+        /*다음주 시작일, 월요일로 설정함*/
+        let nextWeekStartDate = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek + 8);
+        /*다음주 끝나는일, 월요일로 설정함*/
+        let nextWeekEndDate = new Date(nowYear, nowMonth, nowDay + (14 - nowDayOfWeek));
+
 
     </script>
 
@@ -161,6 +204,10 @@
 
         #projectInputGroup {
             display: none;
+        }
+
+        #bottomScheduleTable {
+            padding: 0 30px 0 30px;
         }
     </style>
 
@@ -184,20 +231,21 @@
             </tr>
         </thead>
         <tbody>
+            <!--날짜 자동으로 반영되는 곳-->
             <tr>
-                <th scope="row" style="text-align: center;">Today</th>
+                <th id="todayIs" scope="row" style="text-align: center;">Today</th>
                 <td>''</td>
                 <td>''</td>
                 <td>''</td>
             </tr>
             <tr>
-                <th scope="row" style="text-align:center">This Week</th>
+                <th id="thisWeekIs" scope="row" style="text-align:center">이번주(월~일)</th>
                 <td>''</td>
                 <td>''</td>
                 <td>''</td>
             </tr>
             <tr>
-                <th scope="row" style="text-align:center">Next Week</th>
+                <th id="nextWeekIs" scope="row" style="text-align:center">다음주(월~일)</th>
                 <td>''</td>
                 <td>''</td>
                 <td>''</td>
@@ -212,8 +260,8 @@
     <h1 style="text-align:center;">입력란</h1>
     <!-- 입력란 버튼-->
     <div id="inputButton">
-        <button type="button" class="btn btn-outline-warning" data-toggle="modal" data-target="#scheduleModal"
-            data-whatever="@mdo">스케쥴 추가하기</button>
+        <button type="button" onclick="schulePlusClick()" class="btn btn-outline-warning" data-toggle="modal"
+            data-target="#scheduleModal" data-whatever="@mdo">스케쥴 추가하기</button>
         <!--프로젝트 보기 버튼에 plisting 넣어줌-->
         <button type="button" onclick="plisting()" class="btn btn-outline-info" data-toggle="modal"
             data-target=".bd-example-modal-xl">
@@ -238,9 +286,6 @@
                     <!--프로젝트 드롭다운-->
                     <select id="scheduleProject" class="custom-select">
                         <option selected>어떤 프로젝트?</option>
-                        <option value="1">프로젝트A</option>
-                        <option value="2">프로젝트B</option>
-                        <option value="3">프로젝트C</option>
                     </select>
 
                     <!--스케쥴 내용 입력-->
@@ -271,9 +316,9 @@
                 </div>
                 <div class="modal-body">
                     <div>
+                        <!--내용 볼 프로젝트 선택: 선택하면 내용 & 수정버튼show-->
                         <select id="projectSelector" class="custom-select">
-                            <!--내용 볼 프로젝트 선택: 선택하면 내용 & 수정버튼show-->
-                            <option selected></option>
+                            <option selected>어떤 프로젝트?</option>
                             <option value="1"></option>
                         </select>
                         <!--셀렉된 프로젝트 이름&목적&내용 보여주기-->
@@ -323,22 +368,24 @@
     </div>
     <br>
     <!--입력란 테이블-->
-    <table class="table table-sm">
-        <thead>
-            <tr>
-                <th scope="col">날짜</th>
-                <th scope="col">프로젝트</th>
-                <th scope="col">내용</th>
-            </tr>
-        </thead>
-        <tbody id="scheduleInputTable">
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-        </tbody>
-    </table>
+    <div id="bottomScheduleTable">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th scope="col">날짜</th>
+                    <th scope="col">프로젝트</th>
+                    <th scope="col">내용</th>
+                </tr>
+            </thead>
+            <tbody id="scheduleInputTable">
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </body>
 
 </html>
