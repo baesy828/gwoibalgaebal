@@ -5,7 +5,9 @@ app = Flask(__name__)
 # URL 별로 함수명이 같거나,
 # route('/') 등의 주소가 같으면 안됩니다.
 
-client = MongoClient('localhost', 27017)  # mongoDB는 27017 포트로 돌아갑니다.
+client = MongoClient('mongodb://baesy828:dudtjsqo828@3.34.48.233', 27017,
+                     username='baesy828',
+                     password='dudtjsqo828')  # mongoDB는 27017 포트로 돌아갑니다.
 db = client.dbscheduleManager
 
 
@@ -57,6 +59,7 @@ def input_project():
 def show_project():
     projects = list(db.projects.find({}, {'_id': 0}))
     return jsonify({'result': 'success', 'projects': projects})
+
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
