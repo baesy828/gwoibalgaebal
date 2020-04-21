@@ -187,16 +187,16 @@
         }
 
 
-        /*!!!!!!!!!!!!!!!!! 여기서부터 현황판 시작      !!!!!!!!!!!!!!!*/
+ /*!!!!!!!!!!!!!!!!! 여기서부터 현황판 시작      !!!!!!!!!!!!!!!*/
         /*현황판 부분 날짜 반영*/
         let now = new Date();
         let nowDayOfWeek = now.getDay();
         let nowDay = now.getDate();
+        /*getMonth 단독으로 쓸 때는 0월부터 시작하기 때문에 -1월로 표기될 수 있음*/
         let nowMonth = now.getMonth();
-        let nowYear = now.getYear();
-        nowYear += (nowYear < 2000) ? 1900 : 0;
+        let nowYear = now.getFullYear();
         /*이번주 시작일, 월요일로 설정함*/
-        let weekStartDate = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek + 1);
+        let weekStartDate = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek+1);
         /*이번주 끝나는 일, 일요일로 설정함*/
         let weekEndDate = new Date(nowYear, nowMonth, nowDay + (7 - nowDayOfWeek));
         /*다음주 시작일, 월요일로 설정함*/
@@ -204,8 +204,15 @@
         /*다음주 끝나는일, 월요일로 설정함*/
         let nextWeekEndDate = new Date(nowYear, nowMonth, nowDay + (14 - nowDayOfWeek));
 
+/* 
+id가 todayIs / thisWeekIs / nextWeekIs 인 곳의 현황판 표에 
+  $('#todayIs').val() = nowYear +'년' + nowMonth + '월' + nowDay + '일' 
+  $('#thisWeekIs').val() = weekStartDate '-' weekEndDate
+  $('#nextWeekIs').val() = nextweekStartDate '-' nextWeekEndDate
+  로 노출되도록 하고 싶은데 document.엘리먼트며 뭐며 이것저것 시도해도 잘 안되는지라ㅜㅜ
+  혹시 onclick같은 함수 없이도 자동으로 저 날짜값들이 반영되도록 하는 방법은 없을까요?
+*/
 
-        $('#todayIs').text('now')
 
     </script>
 
@@ -239,22 +246,17 @@
     </div>
     <!--현황판 테이블 -->
     <table class="table table-dark">
-        <thead id="showTableHead">
-            <td>
-            <th scope="col"></th>
-            </td>
-        </thead>
         <tbody id="scheduleInTimeTable">
             <tr>
-                <td id="todayIs" scope="row" style="text-align: center;">오늘</td>
-                <td></td>
+                <th id="todayIs">오늘</th>
+                <td>ㅇㅇ</td>
             </tr>
             <tr>
-                <td id="thisWeekIs" scope="row" style="text-align: center;">이번주</td>
-                <td></td>
+                <th id="thisWeekIs">이번주</th>
+                <td>ㅋㅋㅋ</td>
             </tr>
             <tr>
-                <td id="nextWeekIs" scope="row" style="text-align: center;">다음주</td>
+                <th id="nextWeekIs">다음주</th>
                 <td></td>
             </tr>
         </tbody>
