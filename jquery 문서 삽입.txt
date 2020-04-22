@@ -1,0 +1,7 @@
+
+    <!--jquery 달력-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='flatpickr.min.css') }}">
+    <!--css삽입하려면 위 처럼 link rel="stylesheet" 후에 href=-->
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery-3.2.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='flatpickr.js') }}"></script>
+    <!--JS삽입하려면 처럼 script src =-->
