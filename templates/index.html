@@ -30,16 +30,15 @@
     <!--4/17기준 할 것 
 1. 프로젝트 모달에서 특정 프로젝트 선택했을 때 그 프로젝트의 내용이 하단 테이블에 저절로 노출 
 (했다!/0419 : plisting 함수-프로젝트 보기 눌렀을 때 ajax호출되는 함수-아래에 on(chagne)함수 추가하여 작성)
-2. 현황판에 날짜 반영 : 월-일 고정으로 자동 변동되게 
-3. 스케쥴에 입력된 내용들이 날짜 기준으로 자동으로 위 현황판에 반영
-4. 현황판에 반영된 내용에 이모티콘 자동 입력되고, 했다/안했다 체크할 수 있또록 할 것
-5. 했다/안했다 체크가 된 경우 리뷰를 작성할 수 있또록 할 것
-
+2. 현황판에 날짜 반영 : 월-일 고정으로 자동 변동되게 (드디어 했다 document ready 함수에 append 삽입해서 성공 4/21)
+3. 스케쥴에 입력된 내용들이 날짜 기준으로 자동으로 위 현황판에 반영 /~0422
+4. 현황판에 반영된 내용에 이모티콘 자동 입력되고, 했다/안했다 체크할 수 있또록 할 것c/~0423
+5. 했다/안했다 체크가 된 경우 리뷰를 작성할 수 있또록 할 것 
 6. 아래 입력란 스케쥴 삭제 가능하도록 할 것 
 7. 리포트 내용 구성할 것
 8. 리뷰 페이지 구성할 것 
 9. 리뷰&리포트 페이지 엑셀로 다운받도록 할 것
-10. 프로젝트/스케쥴 삭제+수정 기능 넣기
+10. 프로젝트/스케쥴 삭제+수정 기능 넣기 //~0424
 11. 로그인 페이지-->
 
 
@@ -47,7 +46,56 @@
         $(document).ready(function () {
             $('#scheduleInputTable').html('');
             listing();
+            /*현황판 부분 날짜 반영*/
+            let now = new Date();
+            let nowDayOfWeek = now.getDay();
+            let nowDay = now.getDate();
+            /*getMonth 단독으로 쓸 때는 0월부터 시작하기 때문에 -1월로 표기될 수 있음*/
+            let nowMonth = now.getMonth();
+            let nowYear = now.getFullYear();
+            /*이번주 시작일, 월요일로 설정함*/
+            let thisWeekStart = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek + 1);
+            let weekStartDay = thisWeekStart.getDate();
+            let weekStartMonth = thisWeekStart.getMonth();
+            /*이번주 끝나는 일, 일요일로 설정함*/
+            let thisWeekEnd = new Date(nowYear, nowMonth, nowDay + (7 - nowDayOfWeek));
+            let weekEndDay = thisWeekEnd.getDate();
+            let weekEndMonth = thisWeekEnd.getMonth();
+            /*다음주 시작일, 월요일로 설정함*/
+            let nextWeekStart = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek + 8);
+            let nWeekStartDay = nextWeekStart.getDate();
+            let nWeekStartMonth = nextWeekStart.getMonth();
+            /*다음주 끝나는일, 일요일로 설정함*/
+            let nextWeekEnd = new Date(nowYear, nowMonth, nowDay + (14 - nowDayOfWeek));
+            let nWeekEndDay = nextWeekEnd.getDate();
+            let nweekEndMonth = nextWeekEnd.getMonth();
+            /*현황판에 날짜 자동으로 변경됨*/
+            $('#todayIs').append(nowYear + '년 ' + (nowMonth + 1) + '월 ' + nowDay + '일');
+            $('#thisWeekIs').append((weekStartMonth + 1) + '월 ' + weekStartDay + '일' + '~' + (weekEndMonth + 1) + '월 ' + weekEndDay + '일');
+            $('#nextWeekIs').append((nWeekStartMonth + 1) + '월 ' + nWeekStartDay + '일' + '~' + (nweekEndMonth + 1) + '월 ' + nWeekEndDay + '일');
+            whatSchedule();
         });
+
+
+        /*아래는 위에 넣어야 될 함수 위에 listing 넣은 것처럼 별도 함수로 만들어서 넣을 것
+        function whatSchedule() {
+            $.ajax({
+                type: "GET",
+                url: "/schedules",
+                data: {},
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        let schedules = response['schedules'];
+                        for (let i = 0; i < schedules.length; i++) {
+                            /*날짜에 해당되는 값 리스팅해서 보여주기
+                            if ($('').val() == schedules[i]['scheduleDate']) {
+                                $('#todaySchedule').append(schedules[i]['scheduleContent'])
+                            }
+                        }
+                    }
+                }
+            })
+        }     */
 
 
 
@@ -55,6 +103,7 @@
         /*jquery달력*/
         $(function () {
             $('[data-toggle="datepicker"]').datepicker({
+
                 autoHide: true,
                 zIndex: 2048,
             });
@@ -114,8 +163,6 @@
                 }
             })
         }
-
-
 
         /*append로 스케쥴표에 스케쥴 추가*/
         function scheduleTablePlus(scheduleDate, scheduleProject, scheduleContent) {
@@ -187,16 +234,19 @@
         }
 
 
+<<<<<<< HEAD
         /*!!!!!!!!!!!!!!!!! 여기서부터 현황판 시작      !!!!!!!!!!!!!!!*/
+=======
+ /*!!!!!!!!!!!!!!!!! 여기서부터 현황판 시작      !!!!!!!!!!!!!!!*/
         /*현황판 부분 날짜 반영*/
         let now = new Date();
         let nowDayOfWeek = now.getDay();
         let nowDay = now.getDate();
+        /*getMonth 단독으로 쓸 때는 0월부터 시작하기 때문에 -1월로 표기될 수 있음*/
         let nowMonth = now.getMonth();
-        let nowYear = now.getYear();
-        nowYear += (nowYear < 2000) ? 1900 : 0;
+        let nowYear = now.getFullYear();
         /*이번주 시작일, 월요일로 설정함*/
-        let weekStartDate = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek + 1);
+        let weekStartDate = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek+1);
         /*이번주 끝나는 일, 일요일로 설정함*/
         let weekEndDate = new Date(nowYear, nowMonth, nowDay + (7 - nowDayOfWeek));
         /*다음주 시작일, 월요일로 설정함*/
@@ -204,8 +254,16 @@
         /*다음주 끝나는일, 월요일로 설정함*/
         let nextWeekEndDate = new Date(nowYear, nowMonth, nowDay + (14 - nowDayOfWeek));
 
+/* 
+id가 todayIs / thisWeekIs / nextWeekIs 인 곳의 현황판 표에 
+  $('#todayIs').val() = nowYear +'년' + nowMonth + '월' + nowDay + '일' 
+  $('#thisWeekIs').val() = weekStartDate '-' weekEndDate
+  $('#nextWeekIs').val() = nextweekStartDate '-' nextWeekEndDate
+  로 노출되도록 하고 싶은데 document.엘리먼트며 뭐며 이것저것 시도해도 잘 안되는지라ㅜㅜ
+  혹시 onclick같은 함수 없이도 자동으로 저 날짜값들이 반영되도록 하는 방법은 없을까요?
+*/
+>>>>>>> 37b1a6bd7a859e2cd701b50ba80b734b07924e70
 
-        $('#todayIs').text('now')
 
     </script>
 
@@ -237,29 +295,37 @@
         <button type="button" class="btn btn-outline-warning">리뷰 받기</button>
         <button type="button" class="btn btn-outline-info">리포트 받기</button>
     </div>
-    <!--현황판 테이블 -->
+
+    <!--현황판 테이블-->
     <table class="table table-dark">
-        <thead id="showTableHead">
-            <td>
-            <th scope="col"></th>
-            </td>
-        </thead>
         <tbody id="scheduleInTimeTable">
             <tr>
-                <td id="todayIs" scope="row" style="text-align: center;">오늘</td>
-                <td></td>
+<<<<<<< HEAD
+                <th id="todayIs"></th>
+                <td id="todaySchedule">ㅇㅇ</td>
             </tr>
             <tr>
-                <td id="thisWeekIs" scope="row" style="text-align: center;">이번주</td>
-                <td></td>
+                <th id="thisWeekIs"></th>
+                <td id="thisWekkSchedule">ㅋㅋㅋ</td>
             </tr>
             <tr>
-                <td id="nextWeekIs" scope="row" style="text-align: center;">다음주</td>
+                <th id="nextWeekIs"></th>
+                <td id='nextWeekSchedule'></td>
+=======
+                <th id="todayIs">오늘</th>
+                <td>ㅇㅇ</td>
+            </tr>
+            <tr>
+                <th id="thisWeekIs">이번주</th>
+                <td>ㅋㅋㅋ</td>
+            </tr>
+            <tr>
+                <th id="nextWeekIs">다음주</th>
                 <td></td>
+>>>>>>> 37b1a6bd7a859e2cd701b50ba80b734b07924e70
             </tr>
         </tbody>
     </table>
-
     <br>
     <br>
     <br>
