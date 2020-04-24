@@ -22,17 +22,18 @@
         crossorigin="anonymous"></script>
 
     <!--Datepicker css & js-->
-    <link rel="stylesheet" href="{{ url_for('static', filename='datepicker.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-datepicker.css') }}">
     <!--          css삽입하려면 위 처럼 link rel="stylesheet" 후에 href=-->
-    <script type="text/javascript" src="{{ url_for('static', filename='datepicker.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bootstrap-datepicker.js') }}"></script>
     <!--          JS삽입하려면 처럼 script src =-->
 
     <!--1. 프로젝트 모달에서 특정 프로젝트 선택했을 때 그 프로젝트의 내용이 하단 테이블에 저절로 노출 
 (했다!/0419 : plisting 함수-프로젝트 보기 눌렀을 때 ajax호출되는 함수-아래에 on(chagne)함수 추가하여 작성)
 2. 현황판에 날짜 반영 : 월-일 고정으로 자동 변동되게 (드디어 했다 document ready 함수에 append 삽입해서 성공 4/21)
-3. 스케쥴에 입력된 내용들이 날짜 기준으로 자동으로 위 현황판에 반영 /~0422
 
-4. 현황판에 반영된 내용에 이모티콘 자동 입력되고, 했다/안했다 체크할 수 있또록 할 것c/~0423
+3. 스케쥴에 입력된 내용들이 날짜/(ok!) 
+   3-1프로젝트 기준으로 자동으로 위 현황판에 반영 
+4. 현황판에 반영된 내용에 이모티콘 자동 입력되고, 했다/안했다 체크할 수 있또록 할 것
 5. 했다/안했다 체크가 된 경우 리뷰를 작성할 수 있또록 할 것 
 6. 아래 입력란 스케쥴 삭제 가능하도록 할 것 
 7. 리포트 내용 구성할 것
@@ -73,12 +74,10 @@
             $('#todayIs').append(nowYear + '년 ' + (nowMonth + 1) + '월 ' + nowDay + '일');
             $('#thisWeekIs').append((weekStartMonth + 1) + '월 ' + weekStartDay + '일' + '~' + (weekEndMonth + 1) + '월 ' + weekEndDay + '일');
             $('#nextWeekIs').append((nWeekStartMonth + 1) + '월 ' + nWeekStartDay + '일' + '~' + (nweekEndMonth + 1) + '월 ' + nWeekEndDay + '일');
-            whatSchedule();
-        });
+            
+            projectInNow();
 
-
-        /*아래는 위에 넣어야 될 함수 위에 listing 넣은 것처럼 별도 함수로 만들어서 넣을 것
-        function whatSchedule() {
+            function whatSchedule() {
             $.ajax({
                 type: "GET",
                 url: "/schedules",
@@ -87,25 +86,47 @@
                     if (response['result'] == 'success') {
                         let schedules = response['schedules'];
                         for (let i = 0; i < schedules.length; i++) {
-                            /*날짜에 해당되는 값 리스팅해서 보여주기
-                            if ($('').val() == schedules[i]['scheduleDate']) {
+                            /*날짜에 해당되는 값 리스팅해서 보여주기*/
+                            if (schedules[i]['scheduleDate'] == (nowYear+'-'+nowMonth+'-'+nowDay)) {
                                 $('#todaySchedule').append(schedules[i]['scheduleContent'])
                             }
                         }
                     }
                 }
             })
-        }     */
+        }  
+        });
 
+
+        /*현황판, 프로젝트 자동 */
+        function projectInNow() {
+            $.ajax({
+                type: "GET",
+                url: "/projects",
+                data: {},
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        $('#nowScheduleHead').append('<th>' + '기간' + '</th>')
+                        let projects = response['projects'];
+                        for (let i = 0; i < projects.length; i++) {
+                            $('#nowScheduleHead').append(
+                                '<th>' + projects[i]['projectName'] + '</th>'
+                            )
+                        }
+                    }
+                }
+            })
+        }
+
+        /*아래는 위에 넣어야 될 함수 위에 listing 넣은 것처럼 별도 함수로 만들어서 넣을 것*/
+          
 
 
 
         /*jquery달력*/
         $(function () {
-            $('[data-toggle="datepicker"]').datepicker({
-                
-                
-                dateFormat: 'yyyy-m-d',
+            $('[name="dateSelected"]').datepicker({
+                format: "yyyy-m-d ",
                 autoHide: true,
                 zIndex: 2048,
             });
@@ -272,17 +293,22 @@
 
     <!--현황판 테이블-->
     <table class="table table-dark">
+        <thead id="nowScheduleHead">
+            <tr>
+                <th scope="col"></th>
+            </tr>
+        </thead>
         <tbody id="scheduleInTimeTable">
             <tr>
-                <th id="todayIs"></th>
-                <td id="todaySchedule">ㅇㅇ</td>
+                <td id="todayIs"></td>
+                <td id="todaySchedule"></td>
             </tr>
             <tr>
-                <th id="thisWeekIs"></th>
-                <td id="thisWekkSchedule">ㅋㅋㅋ</td>
+                <td id="thisWeekIs"></td>
+                <td id="thisWekkSchedule"></td>
             </tr>
             <tr>
-                <th id="nextWeekIs"></th>
+                <td id="nextWeekIs"></td>
                 <td id='nextWeekSchedule'></td>
             </tr>
         </tbody>
@@ -315,7 +341,7 @@
                 <div class="modal-body">
                     <!--datepicker(날짜 선택 달력)-->
                     <h6>날짜 선택</h6>
-                    <input id="scheduleDate" type="text" class="form-control" data-toggle="datepicker">
+                    <input id="scheduleDate" type="text" class="form-control" name="dateSelected">
                     <br>
                     <!--프로젝트 드롭다운-->
                     <select id="scheduleProject" class="custom-select">
