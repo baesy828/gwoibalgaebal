@@ -18,7 +18,7 @@ def home():
 # 스케쥴 입력을 포스트로 db에 보내기
 @app.route('/schedules', methods=['POST'])
 def input_schedule():
-    date_receive = request.form['date_give']
+    date_receive = request.form['date_give'].strip()
     project_receive = request.form['project_give']
     content_receive = request.form['content_give']
 

@@ -23,9 +23,8 @@
 
     <!--Datepicker css & js-->
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-datepicker.css') }}">
-    <!--          css삽입하려면 위 처럼 link rel="stylesheet" 후에 href=-->
     <script type="text/javascript" src="{{ url_for('static', filename='bootstrap-datepicker.js') }}"></script>
-    <!--          JS삽입하려면 처럼 script src =-->
+
 
     <!--1. 프로젝트 모달에서 특정 프로젝트 선택했을 때 그 프로젝트의 내용이 하단 테이블에 저절로 노출 
 (했다!/0419 : plisting 함수-프로젝트 보기 눌렀을 때 ajax호출되는 함수-아래에 on(chagne)함수 추가하여 작성)
@@ -74,31 +73,68 @@
             $('#todayIs').append(nowYear + '년 ' + (nowMonth + 1) + '월 ' + nowDay + '일');
             $('#thisWeekIs').append((weekStartMonth + 1) + '월 ' + weekStartDay + '일' + '~' + (weekEndMonth + 1) + '월 ' + weekEndDay + '일');
             $('#nextWeekIs').append((nWeekStartMonth + 1) + '월 ' + nWeekStartDay + '일' + '~' + (nweekEndMonth + 1) + '월 ' + nWeekEndDay + '일');
-            
             projectInNow();
+            whatSchedule();
+        });
 
-            function whatSchedule() {
+
+        function whatSchedule() {
             $.ajax({
                 type: "GET",
                 url: "/schedules",
                 data: {},
                 success: function (response) {
                     if (response['result'] == 'success') {
+                        let now = new Date();
+                        let nowDayOfWeek = now.getDay();
+                        let nowDay = now.getDate();
+                        /*getMonth 단독으로 쓸 때는 0월부터 시작하기 때문에 -1월로 표기될 수 있음*/
+                        let nowMonth = now.getMonth();
+                        let nowYear = now.getFullYear();
+                        /*이번주 시작일, 월요일로 설정함*/
+                        let thisWeekStart = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek + 1);
+                        let weekStartDay = thisWeekStart.getDate();
+                        let weekStartMonth = thisWeekStart.getMonth();
+                        /*이번주 끝나는 일, 일요일로 설정함*/
+                        let thisWeekEnd = new Date(nowYear, nowMonth, nowDay + (7 - nowDayOfWeek));
+                        let weekEndDay = thisWeekEnd.getDate();
+                        let weekEndMonth = thisWeekEnd.getMonth();
+                        /*다음주 시작일, 월요일로 설정함*/
+                        let nextWeekStart = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek + 8);
+                        let nWeekStartDay = nextWeekStart.getDate();
+                        let nWeekStartMonth = nextWeekStart.getMonth();
+                        /*다음주 끝나는일, 일요일로 설정함*/
+                        let nextWeekEnd = new Date(nowYear, nowMonth, nowDay + (14 - nowDayOfWeek));
+                        let nWeekEndDay = nextWeekEnd.getDate();
+                        let nweekEndMonth = nextWeekEnd.getMonth();
+
                         let schedules = response['schedules'];
                         for (let i = 0; i < schedules.length; i++) {
-                            /*날짜에 해당되는 값 리스팅해서 보여주기*/
-                            if (schedules[i]['scheduleDate'] == (nowYear+'-'+nowMonth+'-'+nowDay)) {
+                            /*날짜에 해당되는 스케쥴 내용을 현황판에 보여주기*/
+                            if ((nowYear + '-' + (nowMonth + 1) + '-' + nowDay) == schedules[i]['scheduleDate']
+                                && $('#pNameInShowTable').val() == schedules[i]['scheduleProject']) {
                                 $('#todaySchedule').append(schedules[i]['scheduleContent'])
                             }
                         }
                     }
                 }
             })
-        }  
-        });
+        }
+        /*function projectNum() {
+            $.ajax({
+                type: "GET",
+                url: "/projects",
+                data: {},
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        for (let i = 0; i < projects.length; i++) {
+                            [projects[i]['projectName']] = i + 1;
+                        }
+                    }
+                }*/
 
 
-        /*현황판, 프로젝트 자동 */
+        /*현황판, 프로젝트 자동->여기다 스케쥴도 넣어야 할 듯 */
         function projectInNow() {
             $.ajax({
                 type: "GET",
@@ -117,10 +153,6 @@
                 }
             })
         }
-
-        /*아래는 위에 넣어야 될 함수 위에 listing 넣은 것처럼 별도 함수로 만들어서 넣을 것*/
-          
-
 
 
         /*jquery달력*/
@@ -256,10 +288,6 @@
             })
         }
 
-
-        /*!!!!!!!!!!!!!!!!! 여기서부터 현황판 시작      !!!!!!!!!!!!!!!*/
-
-
     </script>
 
     <style>
@@ -295,7 +323,7 @@
     <table class="table table-dark">
         <thead id="nowScheduleHead">
             <tr>
-                <th scope="col"></th>
+                <th id="pNameInShowTable" scope="col"></th>
             </tr>
         </thead>
         <tbody id="scheduleInTimeTable">
