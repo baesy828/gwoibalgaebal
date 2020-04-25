@@ -114,12 +114,13 @@
                             if ((nowYear + '-' + (nowMonth + 1) + '-' + nowDay) == schedules[i]['scheduleDate']
                                 && $('#pNameInShowTable').val() == schedules[i]['scheduleProject']) {
                                 $('#todaySchedule').append(schedules[i]['scheduleContent'])
-                            }
+                            } /*이건 실패인듯 눙물*/
                         }
                     }
                 }
             })
         }
+
         /*function projectNum() {
             $.ajax({
                 type: "GET",
@@ -148,6 +149,11 @@
                             $('#nowScheduleHead').append(
                                 '<th>' + projects[i]['projectName'] + '</th>'
                             )
+                        }
+                        /* 변수 projectNum에 숫자 부여해주기*/
+                        for (let j = 0; j < proejcts.length; j++) {
+                            projects[j]['projectName'] = j+1
+                            let projectNum = j + 1;
                         }
                     }
                 }
