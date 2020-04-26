@@ -29,10 +29,9 @@
     <!--1. 프로젝트 모달에서 특정 프로젝트 선택했을 때 그 프로젝트의 내용이 하단 테이블에 저절로 노출 
 (했다!/0419 : plisting 함수-프로젝트 보기 눌렀을 때 ajax호출되는 함수-아래에 on(chagne)함수 추가하여 작성)
 2. 현황판에 날짜 반영 : 월-일 고정으로 자동 변동되게 (드디어 했다 document ready 함수에 append 삽입해서 성공 4/21)
-
 3. 스케쥴에 입력된 내용들이 날짜/(ok!) 
-   3-1프로젝트 기준으로 자동으로 위 현황판에 반영 
-4. 현황판에 반영된 내용에 이모티콘 자동 입력되고, 했다/안했다 체크할 수 있또록 할 것
+  3-1프로젝트 기준으로 자동으로 위 현황판에 반영 /(ok...? 하나씩만 들어가는데... 한 줄 씩 들어갈 수 있도록/(ok!)
+4. 현황판에 반영된 내용에 이모티콘 자동 입력되고, 했다/안했다 체크할 수 있도록 할 것
 5. 했다/안했다 체크가 된 경우 리뷰를 작성할 수 있또록 할 것 
 6. 아래 입력란 스케쥴 삭제 가능하도록 할 것 
 7. 리포트 내용 구성할 것
@@ -40,7 +39,6 @@
 9. 리뷰&리포트 페이지 엑셀로 다운받도록 할 것
 10. 프로젝트/스케쥴 삭제+수정 기능 넣기 //~0424
 11. 로그인 페이지-->
-
 
     <script>
         $(document).ready(function () {
@@ -53,31 +51,32 @@
             /*getMonth 단독으로 쓸 때는 0월부터 시작하기 때문에 -1월로 표기될 수 있음*/
             let nowMonth = now.getMonth();
             let nowYear = now.getFullYear();
-            /*이번주 시작일, 월요일로 설정함*/
-            let thisWeekStart = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek + 1);
+            /*이번주 시작일, 일요일로 설정함*/
+            let thisWeekStart = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek);
             let weekStartDay = thisWeekStart.getDate();
             let weekStartMonth = thisWeekStart.getMonth();
-            /*이번주 끝나는 일, 일요일로 설정함*/
-            let thisWeekEnd = new Date(nowYear, nowMonth, nowDay + (7 - nowDayOfWeek));
+            /*이번주 끝나는 일, 토요일로 설정함*/
+            let thisWeekEnd = new Date(nowYear, nowMonth, nowDay + (6 - nowDayOfWeek));
             let weekEndDay = thisWeekEnd.getDate();
             let weekEndMonth = thisWeekEnd.getMonth();
-            /*다음주 시작일, 월요일로 설정함*/
-            let nextWeekStart = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek + 8);
+            /*다음주 시작일, 일요일로 설정함*/
+            let nextWeekStart = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek + 7);
             let nWeekStartDay = nextWeekStart.getDate();
             let nWeekStartMonth = nextWeekStart.getMonth();
-            /*다음주 끝나는일, 일요일로 설정함*/
-            let nextWeekEnd = new Date(nowYear, nowMonth, nowDay + (14 - nowDayOfWeek));
+            /*다음주 끝나는일, 토요일로 설정함*/
+            let nextWeekEnd = new Date(nowYear, nowMonth, nowDay + (13 - nowDayOfWeek));
             let nWeekEndDay = nextWeekEnd.getDate();
             let nweekEndMonth = nextWeekEnd.getMonth();
             /*현황판에 날짜 자동으로 변경됨*/
-            $('#todayIs').append(nowYear + '년 ' + (nowMonth + 1) + '월 ' + nowDay + '일');
-            $('#thisWeekIs').append((weekStartMonth + 1) + '월 ' + weekStartDay + '일' + '~' + (weekEndMonth + 1) + '월 ' + weekEndDay + '일');
-            $('#nextWeekIs').append((nWeekStartMonth + 1) + '월 ' + nWeekStartDay + '일' + '~' + (nweekEndMonth + 1) + '월 ' + nWeekEndDay + '일');
+            $('#todayScheduleRow').append(`<td>${nowYear}년 ${(nowMonth + 1)}월 ${nowDay}일</td>`);
+            $('#thisWeekScheduleRow').append(`<td>${(weekStartMonth + 1)}월 ${weekStartDay}일~${(weekEndMonth + 1)}월 ${weekEndDay}일`);
+            $('#nextWeekScheduleRow').append(`<td>${(nWeekStartMonth + 1)}월 ${nWeekStartDay}일~${(nweekEndMonth + 1)}월 ${nWeekEndDay}일`);
             projectInNow();
             whatSchedule();
         });
 
 
+        let projectNum = {};
         function whatSchedule() {
             $.ajax({
                 type: "GET",
@@ -91,30 +90,107 @@
                         /*getMonth 단독으로 쓸 때는 0월부터 시작하기 때문에 -1월로 표기될 수 있음*/
                         let nowMonth = now.getMonth();
                         let nowYear = now.getFullYear();
-                        /*이번주 시작일, 월요일로 설정함*/
-                        let thisWeekStart = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek + 1);
-                        let weekStartDay = thisWeekStart.getDate();
-                        let weekStartMonth = thisWeekStart.getMonth();
-                        /*이번주 끝나는 일, 일요일로 설정함*/
-                        let thisWeekEnd = new Date(nowYear, nowMonth, nowDay + (7 - nowDayOfWeek));
-                        let weekEndDay = thisWeekEnd.getDate();
-                        let weekEndMonth = thisWeekEnd.getMonth();
-                        /*다음주 시작일, 월요일로 설정함*/
-                        let nextWeekStart = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek + 8);
-                        let nWeekStartDay = nextWeekStart.getDate();
-                        let nWeekStartMonth = nextWeekStart.getMonth();
-                        /*다음주 끝나는일, 일요일로 설정함*/
-                        let nextWeekEnd = new Date(nowYear, nowMonth, nowDay + (14 - nowDayOfWeek));
-                        let nWeekEndDay = nextWeekEnd.getDate();
-                        let nweekEndMonth = nextWeekEnd.getMonth();
+                        /*!!!!!!!이번주 시작일, 일요일로 설정함!!!!!!!*/
+                        let thisSun = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek);
+                        let tSunDay = thisSun.getDate();
+                        let tSunMonth = thisSun.getMonth();
+                        let tSunYear = thisSun.getFullYear();
+                        /*이번주 월요일*/
+                        let thisMon = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek + 1);
+                        let tMonDay = thisMon.getDate();
+                        let tMonMonth = thisMon.getMonth();
+                        let tMonYear = thisMon.getFullYear();
+                        /*이번주 화요일*/
+                        let thisTue = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek + 2);
+                        let tTueDay = thisTue.getDate();
+                        let tTueMonth = thisTue.getMonth();
+                        let tTueYear = thisTue.getFullYear();
+                        /*이번주 수요일*/
+                        let thisWed = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek + 3);
+                        let tWedDay = thisWed.getDate();
+                        let tWedMonth = thisWed.getMonth();
+                        let tWedYear = thisWed.getFullYear();
+                        /*이번주 목요일*/
+                        let thisThu = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek + 4);
+                        let tThuDay = thisThu.getDate();
+                        let tThuMonth = thisThu.getMonth();
+                        let tThuYear = thisThu.getFullYear();
+                        /*이번주 금요일*/
+                        let thisFri = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek + 5);
+                        let tFriDay = thisFri.getDate();
+                        let tFriMonth = thisFri.getMonth();
+                        let tFriYear = thisFri.getFullYear();
+                        /*!!!!!!!!이번주 끝나는 일, 토요일로 설정함!!!!!!!!*/
+                        let thisSat = new Date(nowYear, nowMonth, nowDay + (6 - nowDayOfWeek));
+                        let tSatDay = thisSat.getDate();
+                        let tSatMonth = thisSat.getMonth();
+                        let tSatYear = thisSat.getFullYear();
+                        /*!!!!!!!!!!!다음주 시작일, 일요일로 설정함!!!!!!!!*/
+                        let nextSun = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek + 7);
+                        let nSunDay = nextSun.getDate();
+                        let nSunMonth = nextSun.getMonth();
+                        let nSunYear = nextSun.getFullYear();
+                        /*다음주 월욜*/
+                        let nextMon = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek + 8);
+                        let nMonDay = nextMon.getDate();
+                        let nMonMonth = nextMon.getMonth();
+                        let nMonYear = nextMon.getFullYear();
+                        /*다음주 화욜*/
+                        let nextTue = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek + 9);
+                        let nTueDay = nextTue.getDate();
+                        let nTueMonth = nextTue.getMonth();
+                        let nTueYear = nextTue.getFullYear();
+                        /*다음주 수욜*/
+                        let nextWed = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek + 10);
+                        let nWedDay = nextWed.getDate();
+                        let nWedMonth = nextWed.getMonth();
+                        let nWedYear = nextWed.getFullYear();
+                        /*다음주 목욜*/
+                        let nextThu = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek + 11);
+                        let nThuDay = nextThu.getDate();
+                        let nThuMonth = nextThu.getMonth();
+                        let nThuYear = nextThu.getFullYear();
+                        /*다음주 금욜*/
+                        let nextFri = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek + 12);
+                        let nFriDay = nextFri.getDate();
+                        let nFriMonth = nextFri.getMonth();
+                        let nFriYear = nextFri.getFullYear();
+                        /*!!!!!!!다음주 끝나는일, 토욜로 설정함!!!!!!!!!!!*/
+                        let nextSat = new Date(nowYear, nowMonth, nowDay + (13 - nowDayOfWeek));
+                        let nSatDay = nextSat.getDate();
+                        let nSatMonth = nextSat.getMonth();
+                        let nSatYear = nextSat.getFullYear();
 
                         let schedules = response['schedules'];
                         for (let i = 0; i < schedules.length; i++) {
                             /*날짜에 해당되는 스케쥴 내용을 현황판에 보여주기*/
-                            if ((nowYear + '-' + (nowMonth + 1) + '-' + nowDay) == schedules[i]['scheduleDate']
-                                && $('#pNameInShowTable').val() == schedules[i]['scheduleProject']) {
-                                $('#todaySchedule').append(schedules[i]['scheduleContent'])
-                            } /*이건 실패인듯 눙물*/
+                            if ((nowYear + '-' + (nowMonth + 1) + '-' + nowDay) == schedules[i]['scheduleDate']) {
+                                $('#todayScheduleRow td').eq(projectNum[schedules[i]['scheduleProject']])
+                                .append('<li>' + schedules[i]['scheduleContent'] + '</li>').append('&#x2705;').append('&#x274E;')
+
+                            }
+                            else if ((tSunYear + '-' + (tSunMonth + 1) + '-' + tSunDay) == schedules[i]['scheduleDate']
+                                || (tMonYear + '-' + (tMonMonth + 1) + '-' + tMonDay) == schedules[i]['scheduleDate']
+                                || (tTueYear + '-' + (tTueMonth + 1) + '-' + tTueDay) == schedules[i]['scheduleDate']
+                                || (tWedYear + '-' + (tWedMonth + 1) + '-' + tWedDay) == schedules[i]['scheduleDate']
+                                || (tThuYear + '-' + (tThuMonth + 1) + '-' + tThuDay) == schedules[i]['scheduleDate']
+                                || (tFriYear + '-' + (tFriMonth + 1) + '-' + tFriDay) == schedules[i]['scheduleDate']
+                                || (tSatYear + '-' + (tSatMonth + 1) + '-' + tSatDay) == schedules[i]['scheduleDate']
+                            ) {
+                                $('#thisWeekScheduleRow td').eq(projectNum[schedules[i]['scheduleProject']])
+                                .append('<li>' + schedules[i]['scheduleContent'] +'</li>').append('&#x2705;').append('&#x274E;')
+                            }
+                            else if ((nSunYear + '-' + (nSunMonth + 1) + '-' + nSunDay) == schedules[i]['scheduleDate']
+                                || (nMonYear + '-' + (nMonMonth + 1) + '-' + nMonDay) == schedules[i]['scheduleDate']
+                                || (nTueYear + '-' + (nTueMonth + 1) + '-' + nTueDay) == schedules[i]['scheduleDate']
+                                || (nWedYear + '-' + (nWedMonth + 1) + '-' + nWedDay) == schedules[i]['scheduleDate']
+                                || (nThuYear + '-' + (nThuMonth + 1) + '-' + nThuDay) == schedules[i]['scheduleDate']
+                                || (nFriYear + '-' + (nFriMonth + 1) + '-' + nFriDay) == schedules[i]['scheduleDate']
+                                || (nSatYear + '-' + (nSatMonth + 1) + '-' + nSatDay) == schedules[i]['scheduleDate']
+                            ) {
+                                $('#nextWeekScheduleRow td').eq(projectNum[schedules[i]['scheduleProject']])
+                                .append('<li>' + schedules[i]['scheduleContent'] + '</li>').append('&#x2705;').append('&#x274E;')
+                            }
                         }
                     }
                 }
@@ -135,11 +211,13 @@
                             $('#nowScheduleHead').append(
                                 '<th>' + projects[i]['projectName'] + '</th>'
                             )
+                            $('#todayScheduleRow').append(`<td> </td>`);
+                            $('#thisWeekScheduleRow').append(`<td> </td>`);
+                            $('#nextWeekScheduleRow').append(`<td> </td>`);
                         }
                         /* 변수 projectNum에 숫자 부여해주기*/
-                        for (let j = 0; j < proejcts.length; j++) {
-                            projects[j]['projectName'] = j+1
-                            let projectNum = j + 1;
+                        for (let j = 0; j < projects.length; j++) {
+                            projectNum[projects[j]['projectName']] = j + 1;
                         }
                     }
                 }
@@ -150,7 +228,7 @@
         /*jquery달력*/
         $(function () {
             $('[name="dateSelected"]').datepicker({
-                format: "yyyy-m-d ",
+                format: "yyyy-m-d",
                 autoHide: true,
                 zIndex: 2048,
             });
@@ -319,17 +397,11 @@
             </tr>
         </thead>
         <tbody id="scheduleInTimeTable">
-            <tr>
-                <td id="todayIs"></td>
-                <td id="todaySchedule"></td>
+            <tr id="todayScheduleRow">
             </tr>
-            <tr>
-                <td id="thisWeekIs"></td>
-                <td id="thisWekkSchedule"></td>
+            <tr id="thisWeekScheduleRow">
             </tr>
-            <tr>
-                <td id="nextWeekIs"></td>
-                <td id='nextWeekSchedule'></td>
+            <tr id="nextWeekScheduleRow">
             </tr>
         </tbody>
     </table>
