@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>개발을 괴발개발</title>
+    <title>심플 스케쥴 매니저</title>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -31,14 +31,19 @@
 2. 현황판에 날짜 반영 : 월-일 고정으로 자동 변동되게 (드디어 했다 document ready 함수에 append 삽입해서 성공 4/21)
 3. 스케쥴에 입력된 내용들이 날짜/(ok!) 
   3-1프로젝트 기준으로 자동으로 위 현황판에 반영 /(ok...? 하나씩만 들어가는데... 한 줄 씩 들어갈 수 있도록/(ok!)
-4. 현황판에 반영된 내용에 이모티콘 자동 입력되고, 했다/안했다 체크할 수 있도록 할 것
+
+4. 현황판 내용 모달로 처리할 것 -> 처리 여부 서버로 보내기
 5. 했다/안했다 체크가 된 경우 리뷰를 작성할 수 있또록 할 것 
 6. 아래 입력란 스케쥴 삭제 가능하도록 할 것 
 7. 리포트 내용 구성할 것
 8. 리뷰 페이지 구성할 것 
 9. 리뷰&리포트 페이지 엑셀로 다운받도록 할 것
 10. 프로젝트/스케쥴 삭제+수정 기능 넣기 //~0424
-11. 로그인 페이지-->
+11. 로그인 페이지
+
+스케쥴 입력할 때, 프로젝트명 반드시 기입하도록 알람
+
+-->
 
     <script>
         $(document).ready(function () {
@@ -73,6 +78,7 @@
             $('#nextWeekScheduleRow').append(`<td>${(nWeekStartMonth + 1)}월 ${nWeekStartDay}일~${(nweekEndMonth + 1)}월 ${nWeekEndDay}일`);
             projectInNow();
             whatSchedule();
+
         });
 
 
@@ -166,8 +172,8 @@
                             /*날짜에 해당되는 스케쥴 내용을 현황판에 보여주기*/
                             if ((nowYear + '-' + (nowMonth + 1) + '-' + nowDay) == schedules[i]['scheduleDate']) {
                                 $('#todayScheduleRow td').eq(projectNum[schedules[i]['scheduleProject']])
-                                .append('<li>' + schedules[i]['scheduleContent'] + '</li>').append('&#x2705;').append('&#x274E;')
-
+                                    .append('<li>' + schedules[i]['scheduleContent'] + '    '
+                                        + '<button type="button" class="btn btn-outline-light btn-sm" onclick="checkButton()">' + '&#x2714;' + '</button>' + '</li>')
                             }
                             else if ((tSunYear + '-' + (tSunMonth + 1) + '-' + tSunDay) == schedules[i]['scheduleDate']
                                 || (tMonYear + '-' + (tMonMonth + 1) + '-' + tMonDay) == schedules[i]['scheduleDate']
@@ -178,7 +184,7 @@
                                 || (tSatYear + '-' + (tSatMonth + 1) + '-' + tSatDay) == schedules[i]['scheduleDate']
                             ) {
                                 $('#thisWeekScheduleRow td').eq(projectNum[schedules[i]['scheduleProject']])
-                                .append('<li>' + schedules[i]['scheduleContent'] +'</li>').append('&#x2705;').append('&#x274E;')
+                                    .append('<li>' + schedules[i]['scheduleContent'] + '</li>')
                             }
                             else if ((nSunYear + '-' + (nSunMonth + 1) + '-' + nSunDay) == schedules[i]['scheduleDate']
                                 || (nMonYear + '-' + (nMonMonth + 1) + '-' + nMonDay) == schedules[i]['scheduleDate']
@@ -189,12 +195,17 @@
                                 || (nSatYear + '-' + (nSatMonth + 1) + '-' + nSatDay) == schedules[i]['scheduleDate']
                             ) {
                                 $('#nextWeekScheduleRow td').eq(projectNum[schedules[i]['scheduleProject']])
-                                .append('<li>' + schedules[i]['scheduleContent'] + '</li>').append('&#x2705;').append('&#x274E;')
+                                    .append('<li>' + schedules[i]['scheduleContent'] + '</li>')
+
                             }
                         }
                     }
                 }
             })
+        }
+
+        function checkButton() {
+            $('#presentModal').modal('show');
         }
 
         /*현황판, 프로젝트 자동->여기다 스케쥴도 넣어야 할 듯 */
@@ -223,6 +234,17 @@
                 }
             })
         }
+
+        /*현황판 모달에서 스케쥴 ox 표기*/
+        function scheduleOX() {
+            if ($('#scheduleOXContent').css('display') == 'block') {
+                $('#scheduleOXContent').hide();
+            } else {
+                $('#scheduleOXContent').show();
+            }
+        }
+
+
 
 
         /*jquery달력*/
@@ -408,6 +430,44 @@
     <br>
     <br>
     <br>
+
+
+    <!--현황판 모달 : 텍스트 클릭하면 모달 창 팝업 뜨도록 설정할 것-->
+    <div class="modal fade" id="presentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">스케쥴 체크</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <button type="button" onclick="scheduleOX()" class="btn btn-info btn-lg btn-block">진행 완료!
+                    </button>
+                    <button type="button" onclick="scheduleOX()" class="btn btn-warning btn-lg btn-block">다음
+                        기회에...</button>
+                    <!--스케쥴 내용 입력-->
+                    <br>
+                    <div id="scheduleOXContent">
+                        <div class="form-group">
+                            <label for="message-text" class="col-form-label">내용 입력</label>
+                            <textarea class="form-control" id="scheduleConetent"></textarea>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <!--<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
+                    <button onclick="scheduleDidDidnt()" type="button" class="btn btn-warning">기록</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
 
     <h1 style="text-align:center;">입력란</h1>
     <!-- 입력란 버튼-->
