@@ -61,5 +61,20 @@ def show_project():
     return jsonify({'result': 'success', 'projects': projects})
 
 
+# 리뷰 입력을 포스트로 db에 보내기
+@app.route('/reviews', methods=['POST'])
+def input_review():
+    OX_receive = request.form['OX_give']
+    review_receive = request.form['review_give']
+ 
+    review = {
+        'OX': OX_receive,
+        'review': review_receive,
+    }
+
+    db.reviews.insert_one(review)
+    return jsonify({'result': 'success'})
+
+
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
