@@ -31,15 +31,24 @@
 2. 현황판에 날짜 반영 : 월-일 고정으로 자동 변동되게 (드디어 했다 document ready 함수에 append 삽입해서 성공 4/21)
 3. 스케쥴에 입력된 내용들이 날짜/(ok!) 
   3-1프로젝트 기준으로 자동으로 위 현황판에 반영 /(ok...? 하나씩만 들어가는데... 한 줄 씩 들어갈 수 있도록/(ok!)
-
 4. 현황판 내용 모달로 처리할 것 -> 처리 여부 서버로 보내기
-5. 했다/안했다 체크가 된 경우 리뷰를 작성할 수 있또록 할 것 
-6. 아래 입력란 스케쥴 삭제 가능하도록 할 것 
-7. 리포트 내용 구성할 것
-8. 리뷰 페이지 구성할 것 
-9. 리뷰&리포트 페이지 엑셀로 다운받도록 할 것
-10. 프로젝트/스케쥴 삭제+수정 기능 넣기 //~0424
-11. 로그인 페이지
+5. 했다/안했다 체크하고 리뷰 작성할 수 있도록 할 것 
+
+5/1 기준 추가해야할 기능
+<입력란>
+1. 프로젝트 선택 안하면 alert
+2. 입력란 스케쥴 20개만 노출(게시판 기능)
+3. 필터/정렬 기능
+3. 삭제 기능
+
+
+<현황판>
+1. 했음/안했음 체크해야 리뷰란 뜨도록
+
+<기타>
+1. 리포트 받기 기능
+2. 리뷰 페이지 받기 기능
+3. 로그인 페이지
 
 스케쥴 입력할 때, 프로젝트명 반드시 기입하도록 알람
 
@@ -171,9 +180,10 @@
                             /*날짜에 해당되는 스케쥴 내용을 현황판에 보여주기*/
                             if ((nowYear + '-' + (nowMonth + 1) + '-' + nowDay) == schedules[i]['scheduleDate']) {
                                 $('#todayScheduleRow td').eq(projectNum[schedules[i]['scheduleProject']])
-                                    .append('<li>' + schedules[i]['scheduleContent'] + '    '
-                                        + '<button type="button" class="btn btn-outline-light btn-sm" onclick="checkButton()">' + '&#x2714;' + '</button>' + '</li>')
+                                    .append('<a onclick="checkButton()" id = wScheduleforModal>' + '&#x2714;' + schedules[i]['scheduleContent'] + '</a>')
+
                             }
+
                             else if ((tSunYear + '-' + (tSunMonth + 1) + '-' + tSunDay) == schedules[i]['scheduleDate']
                                 || (tMonYear + '-' + (tMonMonth + 1) + '-' + tMonDay) == schedules[i]['scheduleDate']
                                 || (tTueYear + '-' + (tTueMonth + 1) + '-' + tTueDay) == schedules[i]['scheduleDate']
@@ -196,16 +206,19 @@
                                 $('#nextWeekScheduleRow td').eq(projectNum[schedules[i]['scheduleProject']])
                                     .append('<li>' + schedules[i]['scheduleContent'] + '</li>')
                             }
+
                         }
                     }
                 }
             })
         }
 
-        /*현황판 체크박스 클릭해야 아래 입력 박스가 등장할 수 있도록 으아아아아!*/
+        /*현황판 체크박스 클릭해야 아래 입력 박스가 등장할 수 있도록 으아아아아! 구현 안됨!!(5/1)*/
         function checkButton() {
-            $('#presentModal').modal('show');
+            $('#presentModal').modal('show')
+
         }
+
 
 
         /*현황판, 프로젝트 자동->여기다 스케쥴도 넣어야 할 듯 */
@@ -235,13 +248,13 @@
             })
         }
 
-        /*리뷰 입력해서 post로 보내기*/
+        /*리뷰 입력해서 post로 보내기-> 현황판 모달에 프로젝트/스케쥴 이름도 넣어주고 그 값을 받아올 것(5/1)*/
         function scheduleOX() {
             let radioOX = $('input[name="customRadioInline1"]:checked').val();
             $.ajax({
                 type: "POST",
                 url: "/reviews",
-                data: { OX_give: radioOX, review_give: $('#reviewConetent').val() },
+                data: { OX_give: radioOX, review_give: $('#reviewConetent').val(), prjreview_give: $('#wProjectInModal').text(), schereview_give: $('#wScheduleInModal').text() },
                 success: function (response) {
                     if (response['result'] == 'success') {
                         alert('리뷰 입력 완료!');
@@ -292,7 +305,8 @@
                         for (let i = 0; i < schedules.length; i++) {
                             scheduleTablePlus(schedules[i]['scheduleDate'], schedules[i]['scheduleProject'], schedules[i]['scheduleContent'])
                         }
-                    } else {
+                    }
+                    else {
                         alert('스케쥴 추가중 오류가 발생했습니다');
                     }
                 }
@@ -444,12 +458,15 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">스케쥴 체크</h5>
+                    <h5 class="modal-title" id="presentModalProject"></h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
+                    <span id="wScheduleInModal">
+                    </span>
+                    <br>
                     <div class="custom-control custom-radio custom-control-inline">
                         <input type="radio" id="customRadioInline1" name="customRadioInline1"
                             class="custom-control-input" value="O">
@@ -458,152 +475,152 @@
 
                     <div class="custom-control custom-radio custom-control-inline">
                         <input type="radio" id="customRadioInline2" name="customRadioInline1"
-                            class="custom-control-input" value = "X">
+                            class="custom-control-input" value="X">
                         <label class="custom-control-label" for="customRadioInline2">안했음</label>
                     </div>
                     <!--리뷰 입력-->
                     <br>
-                    <div class="form-group" id="scheduleOXContent">
-                        <label for="message-text" class="col-form-label">리뷰</label>
-                        <textarea class="form-control" id="reviewConetent"></textarea>
-                    </div>
-
-                    <div class="modal-footer">
-                        <!--<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
-                        <button onclick="scheduleOX()" type="button" class="btn btn-warning">리뷰입력!</button>
+                    <div id="scheduleOXContent">
+                        <div class="form-group">
+                            <label for="message-text" class="col-form-label">리뷰</label>
+                            <textarea class="form-control" id="reviewConetent"></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button onclick="scheduleOX()" type="button" class="btn btn-warning">리뷰입력!</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
 
 
+    <h1 style="text-align:center;">입력란</h1>
+    <!-- 입력란 버튼-->
+    <div id="inputButton">
+        <button type="button" onclick="schulePlusClick()" class="btn btn-outline-warning" data-toggle="modal"
+            data-target="#scheduleModal" data-whatever="@mdo">스케쥴 추가하기</button>
+        <!--프로젝트 보기 버튼에 plisting 넣어줌-->
+        <button type="button" onclick="plisting()" class="btn btn-outline-info" data-toggle="modal"
+            data-target=".bd-example-modal-xl">
+            프로젝트 보기</button>
+    </div>
+    <!--스케쥴 모달-->
+    <div class="modal fade" id="scheduleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">새 스케쥴 입력하기</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!--datepicker(날짜 선택 달력)-->
+                    <h6>날짜 선택</h6>
+                    <input id="scheduleDate" type="text" class="form-control" name="dateSelected">
+                    <br>
+                    <!--프로젝트 드롭다운-->
+                    <select id="scheduleProject" class="custom-select">
+                        <option selected>어떤 프로젝트?</option>
+                    </select>
 
-        <h1 style="text-align:center;">입력란</h1>
-        <!-- 입력란 버튼-->
-        <div id="inputButton">
-            <button type="button" onclick="schulePlusClick()" class="btn btn-outline-warning" data-toggle="modal"
-                data-target="#scheduleModal" data-whatever="@mdo">스케쥴 추가하기</button>
-            <!--프로젝트 보기 버튼에 plisting 넣어줌-->
-            <button type="button" onclick="plisting()" class="btn btn-outline-info" data-toggle="modal"
-                data-target=".bd-example-modal-xl">
-                프로젝트 보기</button>
-        </div>
-        <!--스케쥴 모달-->
-        <div class="modal fade" id="scheduleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">새 스케쥴 입력하기</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                    <!--스케쥴 내용 입력-->
+                    <br>
+                    <div class="form-group">
+                        <label for="message-text" class="col-form-label">내용 입력</label>
+                        <textarea class="form-control" id="scheduleConetent"></textarea>
                     </div>
-                    <div class="modal-body">
-                        <!--datepicker(날짜 선택 달력)-->
-                        <h6>날짜 선택</h6>
-                        <input id="scheduleDate" type="text" class="form-control" name="dateSelected">
-                        <br>
-                        <!--프로젝트 드롭다운-->
-                        <select id="scheduleProject" class="custom-select">
+                </div>
+                <div class="modal-footer">
+                    <!--<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
+                    <button onclick="scheduleFix()" type="button" class="btn btn-warning">이렇게 할게요!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--프로젝트 모달-->
+    <div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">프로젝트 보기</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <!--내용 볼 프로젝트 선택: 선택하면 내용 & 수정버튼show-->
+                        <select id="projectSelector" class="custom-select" onchange="changeProject();">
                             <option selected>어떤 프로젝트?</option>
                         </select>
-
-                        <!--스케쥴 내용 입력-->
-                        <br>
+                        <!--셀렉된 프로젝트 이름&목적&내용 보여주기-->
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <td>목표</td>
+                                    <td>내용</td>
+                                </tr>
+                            </thead>
+                            <tbody id="pContentOneByOne">
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!--위 셀렉된 프로젝트 수정-->
+                        <button type="button" onclick="projectEdit()" class="btn btn-outline-info">수정하기</button>
+                        <!--위 셀렉된 프로젝트 삭제(경고창 띄울 것)-->
+                        <button type="button" onclick="projectDelete()" class="btn btn-outline-danger">삭제하기</button>
+                    </div>
+                    <br>
+                    <!--프로젝트 추가하기:버튼 누르면 입력창 show-> 입력창 내용 db로 보내기-->
+                    <button type="button" onclick="projectPlus()" class="btn btn-outline-warning">프로젝트 추가하기</button>
+                    <!--추가 프로젝트 입력란 : onclick상태에서 보여줌-->
+                    <div id="projectInputGroup">
                         <div class="form-group">
-                            <label for="message-text" class="col-form-label">내용 입력</label>
-                            <textarea class="form-control" id="scheduleConetent"></textarea>
+                            <label for="message-text" class="col-form-label">프로젝트명:</label>
+                            <textarea class="form-control" id="projectName"></textarea>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <!--<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
-                        <button onclick="scheduleFix()" type="button" class="btn btn-warning">이렇게 할게요!</button>
+                        <div class="form-group">
+                            <label for="message-text" class="col-form-label">프로젝트 목표:</label>
+                            <textarea class="form-control" id="projectGoal"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="message-text" class="col-form-label">프로젝트 주요 내용:</label>
+                            <textarea class="form-control" id="projectContent"></textarea>
+                        </div>
+                        <button type="button" onclick="projectFix()" class="btn btn-info">입력!</button>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!--프로젝트 모달-->
-        <div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-xl" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">프로젝트 보기</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div>
-                            <!--내용 볼 프로젝트 선택: 선택하면 내용 & 수정버튼show-->
-                            <select id="projectSelector" class="custom-select" onchange="changeProject();">
-                                <option selected>어떤 프로젝트?</option>
-                            </select>
-                            <!--셀렉된 프로젝트 이름&목적&내용 보여주기-->
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <td>목표</td>
-                                        <td>내용</td>
-                                    </tr>
-                                </thead>
-                                <tbody id="pContentOneByOne">
-                                    <tr>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <!--위 셀렉된 프로젝트 수정-->
-                            <button type="button" onclick="projectEdit()" class="btn btn-outline-info">수정하기</button>
-                            <!--위 셀렉된 프로젝트 삭제(경고창 띄울 것)-->
-                            <button type="button" onclick="projectDelete()" class="btn btn-outline-danger">삭제하기</button>
-                        </div>
-                        <br>
-                        <!--프로젝트 추가하기:버튼 누르면 입력창 show-> 입력창 내용 db로 보내기-->
-                        <button type="button" onclick="projectPlus()" class="btn btn-outline-warning">프로젝트 추가하기</button>
-                        <!--추가 프로젝트 입력란 : onclick상태에서 보여줌-->
-                        <div id="projectInputGroup">
-                            <div class="form-group">
-                                <label for="message-text" class="col-form-label">프로젝트명:</label>
-                                <textarea class="form-control" id="projectName"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="message-text" class="col-form-label">프로젝트 목표:</label>
-                                <textarea class="form-control" id="projectGoal"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="message-text" class="col-form-label">프로젝트 주요 내용:</label>
-                                <textarea class="form-control" id="projectContent"></textarea>
-                            </div>
-                            <button type="button" onclick="projectFix()" class="btn btn-info">입력!</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <br>
-        <!--입력란 테이블-->
-        <div id="bottomScheduleTable">
-            <table class="table table-sm">
-                <thead>
-                    <tr>
-                        <th scope="col">날짜</th>
-                        <th scope="col">프로젝트</th>
-                        <th scope="col">내용</th>
-                    </tr>
-                </thead>
-                <tbody id="scheduleInputTable">
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+    </div>
+    <br>
+    <!--입력란 테이블-->
+    <div id="bottomScheduleTable">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th scope="col">날짜</th>
+                    <th scope="col">프로젝트</th>
+                    <th scope="col">내용</th>
+                </tr>
+            </thead>
+            <tbody id="scheduleInputTable">
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </body>
 
 </html>

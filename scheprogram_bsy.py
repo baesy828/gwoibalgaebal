@@ -66,10 +66,14 @@ def show_project():
 def input_review():
     OX_receive = request.form['OX_give']
     review_receive = request.form['review_give']
+    prjreview_receive = request.form['prjreview_give']
+    schereview_receive = request.form['schereview_give']
  
     review = {
         'OX': OX_receive,
         'review': review_receive,
+        'whatProject' : prjreview_receive,
+        'whatSchedule' : schereview_receive
     }
 
     db.reviews.insert_one(review)
