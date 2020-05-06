@@ -180,7 +180,13 @@
                             /*날짜에 해당되는 스케쥴 내용을 현황판에 보여주기*/
                             if ((nowYear + '-' + (nowMonth + 1) + '-' + nowDay) == schedules[i]['scheduleDate']) {
                                 $('#todayScheduleRow td').eq(projectNum[schedules[i]['scheduleProject']])
-                                    .append('<a onclick="checkButton()" id = wScheduleforModal>' + '&#x2714;' + schedules[i]['scheduleContent'] + '</a>')
+                                    .append('<a onclick="checkButton(this)" class = "wScheduleforModal">' + '&#x2714;' + schedules[i]['scheduleContent'] + '</a>')
+                                                              
+                                $('.wScheduleforModal').on('click', function () {
+                                    $("#presentModalProject").append(schedules[i]['scheduleProject'])
+                                }
+                                )
+
 
                             }
 
