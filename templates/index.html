@@ -9,12 +9,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
     <!-- JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
 
     <!--Datepicker css & js-->
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-datepicker.css') }}">
@@ -34,27 +39,29 @@
    모달 바디 안에 스케쥴 입력되도록 할 것!!(5/7처리 완료)
 5. 했다/안했다 체크하고 리뷰 작성할 수 있도록 할 것  
 
-5/1 기준 추가해야할 기능
+추가해야할 기능
 <입력란>
 1. 프로젝트 선택 안하면 alert (5/7 처리 완료)
 2. 입력란 스케쥴 20개만 노출(게시판 기능)(5/9 완료)
 3. 필터/정렬 기능(5/9 완료)
-3. 삭제 기능
+4. 삭제 기능 -> 스케쥴 삭제 클릭하면 해당 내용 find해서 입력란이랑 현황판 란에서 해당 내용 hide 시키기
+5. 수정 기능 -> 스케쥴 수정 클릭하면 해당 내용 find해서 입력란이랑 현황판 란에서 해당 내용 hide 한 후 입력값 추가하기  
 
 
 <현황판>
-1. 했음/안했음 체크해야 리뷰란 뜨도록
-2. 리뷰 입력 완료되면 해당일 스케쥴은 색깔 변하도록
+1. 리뷰 입력 완료되면 해당일 스케쥴은 색깔 변하도록
+2. 프로젝트 필터 기능(맥시멈 5개만 노출 가능)
 
 <기타>
 1. 리포트 받기 기능 (엑셀)
 2. 리뷰 페이지 받기 기능 (엑셀)
 3. 디자인
 4. 로그인 페이지
+5. id값 정책 정해서 수정할 것 
 -->
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#scheduleInputTable').html('');
             listing();
             /*현황판 부분 날짜 반영*/
@@ -91,13 +98,12 @@
 
 
         let projectNum = {};
-
         function whatSchedule() {
             $.ajax({
                 type: "GET",
                 url: "/schedules",
                 data: {},
-                success: function(response) {
+                success: function (response) {
                     if (response['result'] == 'success') {
                         let now = new Date();
                         let nowDayOfWeek = now.getDay();
@@ -182,7 +188,7 @@
                             if ((nowYear + '-' + (nowMonth + 1) + '-' + nowDay) == schedules[i]['scheduleDate']) {
                                 $('#todayScheduleRow td').eq(projectNum[schedules[i]['scheduleProject']])
                                     .append('<a onclick="checkButton(this)" class = "wScheduleforModal" id="scheModal' + i + '">' + '&#x2714;' + schedules[i]['scheduleContent'] + '</a>')
-                                $('#scheModal' + i).on('click', function() {
+                                $('#scheModal' + i).on('click', function () {
                                     $('#presentModalProject').empty()
                                     $("#presentModalProject").append(schedules[i]['scheduleProject'])
                                     $('#wScheduleInModal').empty()
@@ -230,7 +236,7 @@
                 type: "GET",
                 url: "/projects",
                 data: {},
-                success: function(response) {
+                success: function (response) {
                     if (response['result'] == 'success') {
                         $('#nowScheduleHead').append('<th>' + '기간' + '</th>')
                         let projects = response['projects'];
@@ -263,7 +269,7 @@
                     prjreview_give: $('#presentModalProject').text(),
                     schereview_give: $('#wScheduleInModal').text()
                 },
-                success: function(response) {
+                success: function (response) {
                     if (response['result'] == 'success') {
                         alert('리뷰 입력 완료!');
                         window.location.reload();
@@ -276,7 +282,7 @@
         }
 
         /*jquery달력*/
-        $(function() {
+        $(function () {
             $('[name="dateSelected"]').datepicker({
                 format: "yyyy-m-d",
                 autoHide: true,
@@ -301,17 +307,16 @@
                 return;
             }
 
-
             $.ajax({
                 type: "POST",
                 url: "/schedules",
-                /*위에 어떤 url으로 요청할 것인가*/
                 data: {
                     date_give: $('#scheduleDate').val(),
                     project_give: $('#scheduleProject option:selected').text(),
-                    content_give: $('#scheduleConetent').val()
+                    content_give: $('#scheduleConetent').val(),
+                    dodont_give: 'Y'
                 },
-                success: function(response) {
+                success: function (response) {
                     if (response['result'] == 'success') {
                         alert('스케쥴이 저장됐습니다!힘내요!');
                         window.location.reload();
@@ -328,12 +333,14 @@
                 type: "GET",
                 url: "/schedules",
                 data: {},
-                success: function(response) {
+                success: function (response) {
 
                     if (response['result'] == 'success') {
                         let schedules = response['schedules'];
                         for (let i = 0; i < schedules.length; i++) {
-                            scheduleTablePlus(schedules[i]['scheduleDate'], schedules[i]['scheduleProject'], schedules[i]['scheduleContent'])
+                            if (schedules[i]['scheduleDodont'] == 'Y') {
+                                scheduleTablePlus(schedules[i]['scheduleDate'], schedules[i]['scheduleProject'], schedules[i]['scheduleContent'])
+                            }
                         }
                         $('#scheduleTable').DataTable();
                     } else {
@@ -348,7 +355,7 @@
                 type: "GET",
                 url: "/projects",
                 data: {},
-                success: function(response) {
+                success: function (response) {
                     if (response['result'] == 'success') {
                         let projects = response['projects'];
                         $('#projectSelector').empty();
@@ -367,9 +374,47 @@
                                 <td>' + scheduleDate + '</td>\
                                 <td>' + scheduleProject + '</td>\
                                 <td>' + scheduleContent + '</td>\
+                                <td><button onclick = "scheduleMod()">' + '수정' + '</button>' + '<button onclick = "scheduleDel()">' + '삭제' + '</button></td>\
                             </tr>';
             $('#scheduleInputTable').append(temp_html);
+
         }
+        function scheduleDel() {
+            alert('스케쥴을 삭제합니다')
+            $.ajax({
+                type: "PUT",
+                url: "/schedules",
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(JSONObject),
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        let schedules = response['schedules'];
+                        for (let i = 0; i < schedules.length; i++) { }
+
+                    }
+                }
+            })
+        }
+        /*삭제 버튼 누르면 alert 띄우고 현황판+입력판에서 해당 내용 안 보이게 하기
+        function scheduleDel() {
+            alert('스케쥴을 삭제합니다')
+            $.ajax({
+                type: "POST",
+                url: "/schedules",
+                data: {
+                    date_give: $('#scheduleDate').val(),
+                    project_give: $('#scheduleProject option:selected').text(),
+                    content_give: $('#scheduleConetent').val()
+                },
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        alert('스케쥴이 저장됐습니다!힘내요!');
+                        window.location.reload();
+                    }
+                }
+            })
+        }*/
+
 
         /*프로젝트 모달에 프로젝트 추가하기:버튼 누르면 보여주기*/
         function projectPlus() {
@@ -405,7 +450,7 @@
                     goal_give: $('#projectGoal').val(),
                     pcontent_give: $('#projectContent').val()
                 },
-                success: function(response) {
+                success: function (response) {
                     if (response['result'] == 'success') {
                         alert('프로젝트 시작을 축하합니다!');
                         window.location.reload();
@@ -422,7 +467,7 @@
                 type: "GET",
                 url: "/projects",
                 data: {},
-                success: function(response) {
+                success: function (response) {
                     if (response['result'] == 'success') {
                         let projects = response['projects'];
                         $('#projectSelector').empty();
@@ -430,7 +475,7 @@
                             /*프로젝트 db를 프로젝트 모달의 프로젝트 셀렉터에 show*/
                             $('#projectSelector').append("<option value='" + projects[i]['projectName'] + "'>" + projects[i]['projectName'] + "</option>");
                             /*선택한 프로젝트의 내용을 셀렉터 아래에 보여주기(0419)*/
-                            $('#projectSelector').on('change', function() {
+                            $('#projectSelector').on('change', function () {
                                 if ($('#projectSelector option:selected').val() == projects[i]['projectName']) {
                                     $('#pContentOneByOne').empty().append(
                                         '<tr>\
@@ -450,15 +495,15 @@
 
     <style>
         /* 여기에 스타일 */
-        
+
         #review_reportButton {
             text-align: right;
         }
-        
+
         #inputButton {
             text-align: right;
         }
-        
+
         #projectInputGroup {
             display: none;
         }
@@ -496,7 +541,8 @@
 
 
     <!--현황판 모달 : 텍스트 클릭하면 모달 창 팝업 뜨도록 설정할 것-->
-    <div class="modal fade" id="presentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="presentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -510,12 +556,14 @@
                     </p>
                     <br>
                     <div class="custom-control custom-radio custom-control-inline">
-                        <input type="radio" id="customRadioInline1" name="customRadioInline1" class="custom-control-input" value="O">
+                        <input type="radio" id="customRadioInline1" name="customRadioInline1"
+                            class="custom-control-input" value="O">
                         <label class="custom-control-label" for="customRadioInline1">했음</label>
                     </div>
 
                     <div class="custom-control custom-radio custom-control-inline">
-                        <input type="radio" id="customRadioInline2" name="customRadioInline1" class="custom-control-input" value="X">
+                        <input type="radio" id="customRadioInline2" name="customRadioInline1"
+                            class="custom-control-input" value="X">
                         <label class="custom-control-label" for="customRadioInline2">안했음</label>
                     </div>
                     <!--리뷰 입력-->
@@ -539,14 +587,17 @@
     <h1 style="text-align:center;">입력란</h1>
     <!-- 입력란 버튼-->
     <div id="inputButton">
-        <button type="button" onclick="schulePlusClick()" class="btn btn-outline-warning" data-toggle="modal" data-target="#scheduleModal" data-whatever="@mdo">스케쥴 추가하기</button>
+        <button type="button" onclick="schulePlusClick()" class="btn btn-outline-warning" data-toggle="modal"
+            data-target="#scheduleModal" data-whatever="@mdo">스케쥴 추가하기</button>
         <!--프로젝트 보기 버튼에 plisting 넣어줌-->
-        <button type="button" onclick="plisting()" class="btn btn-outline-info" data-toggle="modal" data-target=".bd-example-modal-xl">
+        <button type="button" onclick="plisting()" class="btn btn-outline-info" data-toggle="modal"
+            data-target=".bd-example-modal-xl">
             프로젝트 보기</button>
     </div>
 
     <!--스케쥴 모달-->
-    <div class="modal fade" id="scheduleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="scheduleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -581,7 +632,8 @@
     </div>
 
     <!--프로젝트 모달-->
-    <div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel" aria-hidden="true">
+    <div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -646,6 +698,7 @@
                 <th scope="col">날짜</th>
                 <th scope="col">프로젝트</th>
                 <th scope="col">내용</th>
+                <th>수정/삭제</th>
             </tr>
         </thead>
         <tbody id="scheduleInputTable">
@@ -653,7 +706,7 @@
                 <td></td>
                 <td></td>
                 <td></td>
-
+                <td></td>
             </tr>
         </tbody>
         <tfoot></tfoot>

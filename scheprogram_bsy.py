@@ -21,11 +21,13 @@ def input_schedule():
     date_receive = request.form['date_give'].strip()
     project_receive = request.form['project_give']
     content_receive = request.form['content_give']
+    dodont_receive = request.form['dodont_give']
 
     schedule = {
         'scheduleDate': date_receive,
         'scheduleProject': project_receive,
-        'scheduleContent': content_receive
+        'scheduleContent': content_receive,
+        'scheduleDodont' : dodont_receive
     }
 
     db.schedules.insert_one(schedule)
