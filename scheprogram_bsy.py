@@ -16,7 +16,7 @@ def home():
     return render_template('index.html')
 
 # 스케쥴 입력을 포스트로 db에 보내기
-@app.route('/schedules', methods=['POST'])
+@app.route('/schedules', methods=['POST','PUT'])
 def input_schedule():
     date_receive = request.form['date_give'].strip()
     project_receive = request.form['project_give']
