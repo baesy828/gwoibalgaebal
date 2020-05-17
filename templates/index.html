@@ -376,7 +376,9 @@
         }
 
 
-        /*삭제 버튼 누르면 alert 띄우고 scheduleDodont값에 N 부여...?*/
+        /*삭제 버튼 누르면 alert 띄우고 scheduleDodont값에 N 부여...?
+         (0516)python에 있는 정보를 javascript에 보낼때는 success 안에 넣지만, 
+         POST 처럼 javascript 에 저장되어 있던 정보를 서버로 보내려면 data: 안에다가 어떤 정보를 넣어서 보내줘야*/
         function scheduleDel() {
             alert('스케쥴을 삭제합니다')
                 /*클릭한 값의 스케쥴*/
@@ -385,7 +387,7 @@
                 type: "PUT",
                 url: "/schedules",
                 contentType: 'application/json; charset=utf-8',
-                data: JSON.stringify(JSONObject),
+                data: {},
                 success: function(response) {
                     if (response['result'] == 'success') {
                         let schedules = response['schedules'];
