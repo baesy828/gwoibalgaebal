@@ -16,22 +16,27 @@ def home():
     return render_template('index.html')
 
 # 스케쥴 입력을 포스트로 db에 보내기
-@app.route('/schedules', methods=['POST','PUT'])
+@app.route('/schedules', methods=['POST', 'PUT'])
 def input_schedule():
-    date_receive = request.form['date_give'].strip()
-    project_receive = request.form['project_give']
-    content_receive = request.form['content_give']
-    dodont_receive = request.form['dodont_give']
+    if request.method == 'POST':
+        date_receive = request.form['date_give'].strip()
+        project_receive = request.form['project_give']
+        content_receive = request.form['content_give']
+        dodont_receive = request.form['dodont_give']
 
-    schedule = {
-        'scheduleDate': date_receive,
-        'scheduleProject': project_receive,
-        'scheduleContent': content_receive,
-        'scheduleDodont' : dodont_receive
-    }
+        schedule = {
+            'scheduleDate': date_receive,
+            'scheduleProject': project_receive,
+            'scheduleContent': content_receive,
+            'scheduleDodont': dodont_receive
+        }
 
-    db.schedules.insert_one(schedule)
-    return jsonify({'result': 'success'})
+        db.schedules.insert_one(schedule)
+        return jsonify({'result': 'success'})
+
+    #else if request.method == 'PUT':
+    #    delschedule = 
+
 
 # 스케쥴 입력을 겟으로 프론트에 보내기
 @app.route('/schedules', methods=['GET'])
@@ -70,12 +75,12 @@ def input_review():
     review_receive = request.form['review_give']
     prjreview_receive = request.form['prjreview_give']
     schereview_receive = request.form['schereview_give']
- 
+
     review = {
         'OX': OX_receive,
         'review': review_receive,
-        'whatProject' : prjreview_receive,
-        'whatSchedule' : schereview_receive
+        'whatProject': prjreview_receive,
+        'whatSchedule': schereview_receive
     }
 
     db.reviews.insert_one(review)
