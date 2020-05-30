@@ -370,7 +370,7 @@
                                 <td>' + scheduleDate + '</td>\
                                 <td>' + scheduleProject + '</td>\
                                 <td>' + scheduleContent + '</td>\
-                                <td><button onclick = "scheduleMod()">' + '수정' + '</button>' + '<button onclick = "scheduleDel()">' + '삭제' + '</button></td>\
+                                <td><button class="btn btn-secondary" onclick = "scheduleMod()">' + '수정' + '</button>' + '<button class="btn btn-light" onclick = "scheduleDel()">' + '삭제' + '</button></td>\
                             </tr>';
             $('#scheduleInputTable').append(temp_html);
         }
@@ -503,7 +503,7 @@
     <!--리뷰/리포트 버튼-->
     <div id="review_reportButton">
         <button type="button" class="btn btn-outline-warning">리뷰 받기</button>
-        <button type="button" class="btn btn-outline-info">리포트 받기</button>
+        <!--이건 아직 보류<button type="button" class="btn btn-outline-info">리포트 받기</button>-->
     </div>
 
     <!--현황판 테이블-->
@@ -672,8 +672,8 @@
     </div>
     <br>
     <!--입력란 테이블-->
-    <table id="scheduleTable" class="table table-striped table-bordered" style="width:100%">
-        <thead>
+    <table id="scheduleTable" class="table" style="width:100%">
+        <thead class="thead-dark">
             <tr>
                 <th scope="col">날짜</th>
                 <th scope="col">프로젝트</th>
