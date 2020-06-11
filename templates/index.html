@@ -57,7 +57,6 @@
 
     <script>
         $(document).ready(function() {
-            $('#scheduleInputTable').html('');
             listing();
             /*현황판 부분 날짜 반영*/
             let now = new Date();
@@ -182,8 +181,14 @@
                         for (let i = 0; i < schedules.length; i++) {
                             /*날짜에 해당되는 스케쥴 내용을 현황판에 보여주기*/
                             if ((nowYear + '-' + (nowMonth + 1) + '-' + nowDay) == schedules[i]['scheduleDate']) {
-                                $('#todayScheduleRow td').eq(projectNum[schedules[i]['scheduleProject']])
-                                    .append('<a onclick="checkButton(this)" class = "wScheduleforModal" id="scheModal' + i + '">' + '&#x2714;' + schedules[i]['scheduleContent'] + '</a>')
+                                if (schedules[i]['scheduleOX'] != undefined) {
+                                    $('#todayScheduleRow td').eq(projectNum[schedules[i]['scheduleProject']])
+                                        .append('<strike><a onclick="checkButton(this)" class = "wScheduleforModal" id="scheModal' + i + '">' + '● ' + schedules[i]['scheduleContent'] + '</a></strike><br>')
+
+                                } else {
+                                    $('#todayScheduleRow td').eq(projectNum[schedules[i]['scheduleProject']])
+                                        .append('<a onclick="checkButton(this)" class = "wScheduleforModal" id="scheModal' + i + '">' + '● ' + schedules[i]['scheduleContent'] + '</a><br>')
+                                }
                                 $('#scheModal' + i).on('click', function() {
                                     $('#presentModalProject').empty()
                                     $("#presentModalProject").append(schedules[i]['scheduleProject'])
@@ -231,6 +236,7 @@
             $.ajax({
                 type: "GET",
                 url: "/projects",
+                async: false,
                 data: {},
                 success: function(response) {
                     if (response['result'] == 'success') {
@@ -259,6 +265,7 @@
             $.ajax({
                 type: "POST",
                 url: "/reviews",
+                async: false,
                 data: {
                     OX_give: radioOX,
                     review_give: $('#reviewConetent').val(),
@@ -325,9 +332,11 @@
 
         /*ajax로 스케쥴 입력 부분 get요청하기*/
         function listing() {
+            $('#scheduleInputTable').html('');
             $.ajax({
                 type: "GET",
                 url: "/schedules",
+                async: false,
                 data: {},
                 success: function(response) {
 
@@ -350,6 +359,7 @@
             $.ajax({
                 type: "GET",
                 url: "/projects",
+                async: false,
                 data: {},
                 success: function(response) {
                     if (response['result'] == 'success') {
@@ -366,12 +376,12 @@
 
         /*append로 스케쥴표에 스케쥴 추가*/
         function scheduleTablePlus(scheduleDate, scheduleProject, scheduleContent) {
-            let temp_html = '<tr>\
-                                <td>' + scheduleDate + '</td>\
-                                <td>' + scheduleProject + '</td>\
-                                <td>' + scheduleContent + '</td>\
-                                <td><button class="btn btn-secondary" onclick = "scheduleMod()">' + '수정' + '</button>' + '<button class="btn btn-light" onclick = "scheduleDel()">' + '삭제' + '</button></td>\
-                            </tr>';
+            let temp_html = `<tr>\
+                                <td>${scheduleDate}</td>\
+                                <td>${scheduleProject}</td>\
+                                <td>${scheduleContent}</td>\
+                                <td><button class="btn btn-secondary" onclick = "scheduleModal()">수정</button><button class="btn btn-light" onclick = "scheduleDel({scheduleProject: '${scheduleProject}', scheduleContent: '${scheduleContent}'})">삭제</button></td>\
+                            </tr>`;
             $('#scheduleInputTable').append(temp_html);
         }
 
@@ -379,24 +389,24 @@
         /*삭제 버튼 누르면 alert 띄우고 scheduleDodont값에 N 부여...?
          (0516)python에 있는 정보를 javascript에 보낼때는 success 안에 넣지만, 
          POST 처럼 javascript 에 저장되어 있던 정보를 서버로 보내려면 data: 안에다가 어떤 정보를 넣어서 보내줘야*/
-        function scheduleDel() {
+        function scheduleDel(schedule) {
             alert('스케쥴을 삭제합니다')
                 /*클릭한 값의 스케쥴*/
             let clickedDelSche = $(this).closest('tr').find('td')[2];
             $.ajax({
-                type: "PUT",
-                url: "/schedules",
-                contentType: 'application/json; charset=utf-8',
-                data: {},
+                type: "POST",
+                url: "/delete_schedule",
+                async: false,
+                data: schedule,
                 success: function(response) {
                     if (response['result'] == 'success') {
-                        let schedules = response['schedules'];
-                        for (let i = 0; i < schedules.length; i++) {
-                            if (schedules[i]['scheduleContent'] == clickedDelSche) {
-                                schedules[i]['scheduleDodont'] = 'N'
-                            }
-                        }
-
+                        // let schedules = response['schedules'];
+                        // for (let i = 0; i < schedules.length; i++) {
+                        //     if (schedules[i]['scheduleContent'] == clickedDelSche) {
+                        //         schedules[i]['scheduleDodont'] = 'N'
+                        //     }
+                        // }
+                        window.location.reload()
                     }
                 }
             })
@@ -478,10 +488,58 @@
                 }
             })
         }
+
+        function generateCSV() {
+            $.ajax({
+                type: "GET",
+                url: "/schedules",
+                async: false,
+                data: {},
+                success: function(response) {
+                    let schedules = response['schedules']
+                    let csvContent = "data:text/csv;charset=UTF-8,\ufeff";
+                    csvContent += "날짜,프로젝트명,스케줄,수행여부,리뷰\r\n"
+                    for (let i = 0; i < schedules.length; i++) {
+                        csvContent += schedules[i]['scheduleDate'] + ',' +
+                            schedules[i]['scheduleProject'] + ',' +
+                            schedules[i]['scheduleContent'] + ',' +
+                            schedules[i]['scheduleOX'] + ',' +
+                            schedules[i]['scheduleReview'] + '\r\n'
+                    }
+                    var encodeUri = encodeURI(csvContent);
+                    var link = document.createElement('a');
+                    link.setAttribute('href', encodeUri)
+                    date = new Date()
+                    link.setAttribute('download', (date.getMonth() + 1) + '-' + date.getDate() + '-review.csv');
+                    document.body.appendChild(link)
+                    link.click()
+                }
+            })
+
+        }
+
+        function projectDelete() {
+            $.ajax({
+                type: "POST",
+                url: "/delete_project",
+                async: false,
+                data: {
+                    name_give: $('#projectSelector').val()
+                },
+                success: function(response) {
+                    alert('삭제 성공')
+                    window.location.reload()
+                }
+            })
+        }
     </script>
 
     <style>
         /* 여기에 스타일 */
+        
+        #todayScheduleRow td a {
+            cursor: pointer;
+        }
         
         #review_reportButton {
             text-align: right;
@@ -502,7 +560,7 @@
     <h1 style="text-align: center;">현황판</h1>
     <!--리뷰/리포트 버튼-->
     <div id="review_reportButton">
-        <button type="button" class="btn btn-outline-warning">리뷰 받기</button>
+        <button type="button" onclick="generateCSV()" class="btn btn-outline-warning">리뷰 받기</button>
         <!--이건 아직 보류<button type="button" class="btn btn-outline-info">리포트 받기</button>-->
     </div>
 
